@@ -11,7 +11,7 @@ on:
 jobs:
   deploy:
     name: Deploy on Self-Hosted VM
-    # ⚡ Tourne DIRECTEMENT sur votre VM Ubuntu (le runner qu'on vient d'installer)
+    # Tourne DIRECTEMENT sur votre VM Ubuntu (le runner qu'on vient d'installer)
     runs-on: self-hosted
 
     # Ne se déploie QUE si le pipeline Docker a réussi (pas en cas d'échec)
@@ -35,13 +35,14 @@ jobs:
 
       # 4. Arrête les anciens conteneurs proprement
       - name: Stop existing containers
-        run: docker compose down --remove-orphans
+        run: docker compose -f docker-compose.prod.yml down --remove-orphans
         continue-on-error: true
 
-      # 5. Démarre tous les services avec la nouvelle version
+      # 5. Démarre tous les services avec la nouvelle version (images Docker Hub)
       - name: Start all services
-        run: docker compose up -d --pull always
+        run: docker compose -f docker-compose.prod.yml up -d
         env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
