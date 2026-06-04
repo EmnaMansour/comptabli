@@ -1,4 +1,4 @@
-name: Comptabli Full CI/CD Pipeline
+ï»¿name: Comptabli Full CI/CD Pipeline
 
 on:
   push:
@@ -215,7 +215,7 @@ jobs:
   # STAGE 3 : DEPLOY TO VM (CD)
   # ==========================================
   deploy-vm:
-    name: Deploy to Self-Hosted VM
+    name: Continuous Deployment (CD)
     runs-on: self-hosted
     needs: [docker-frontend, docker-backend, docker-ocr]
     steps:
@@ -243,6 +243,6 @@ jobs:
           NODE_ENV: production
       - name: Verify deployment
         run: |
-          echo "=== Conteneurs en cours d'exécution ==="
+          echo "=== Conteneurs en cours d'exÃ©cution ==="
           docker ps
-          echo "=== Déploiement réussi ! ==="
+          echo "=== DÃ©ploiement rÃ©ussi ! ==="
