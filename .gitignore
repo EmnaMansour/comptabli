@@ -1,0 +1,53 @@
+# Variables d'environnement (Sécurité)
+.env
+.env.*
+!.env.example
+.env.test
+.env.local
+
+# Dépendances (Node.js & Python)
+node_modules/
+__pycache__/
+*.pyc
+venv/
+env/
+.venv/
+
+# Build & Logs
+dist/
+build/
+logs/
+*.log
+npm-debug.log*
+
+# Système (Mac/Windows)
+.DS_Store
+Thumbs.db
+
+# Fichiers générés spécifiques (si besoin)
+/backend/generated/
+
+# ==========================================
+# NETTOYAGE DU PROJET (Ignorés pour GitHub)
+# ==========================================
+
+# 1. Dossiers de brouillon locaux
+scratch/
+ocr-service/scratch/
+
+# 2. Résultats JSON de tests OCR temporaires
+ocr_result*.json
+
+# 3. Bases de données SQLite locales de test
+*.db
+ocr-service/ocr_feedback.db
+
+# 4. Modèles de langage lourds (inutiles ou téléchargés via Docker)
+ocr-service/tessdata/
+
+# 5. Fichiers téléversés secrets clients (PDFs, Images)
+backend/uploads/
+frontend/public/uploads/
+
+# 6. Dossiers node_modules accidentels à la racine (s'il y en a)
+/node_modules/

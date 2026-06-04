@@ -1,0 +1,770 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                         String                    @id @default(cuid())
+  email                      String                    @unique
+  password                   String
+  firstName                  String
+  lastName                   String
+  role                       Role
+  status                     Status                    @default(PENDING)
+  companyName                String?
+  createdAt                  DateTime                  @default(now())
+  updatedAt                  DateTime                  @updatedAt
+  mustChangePassword         Boolean                   @default(false)
+  emailVerificationExpires   DateTime?
+  emailVerificationTokenHash String?                   @unique
+  emailVerifiedAt            DateTime?
+  passwordResetTokenHash     String?                   @unique
+  passwordResetExpires       DateTime?
+  birthDate                  DateTime?
+  cinUrl                     String?
+  diplomaUrl                 String?
+  experienceLevel            String?
+  hireDate                   DateTime?
+  phone                      String?
+  activitySector             String?
+  headquarters               String?
+  legalType                  String?
+  location                   String?
+  mapsLink                   String?
+  rcNumber                   String?
+  whatsapp                   String?
+  patenteUrl                 String?
+  rneUrl                     String?
+  website                    String?
+  accountantClients          AccountantClient[]        @relation("AccountantClients")
+  clientAccountants          AccountantClient[]        @relation("ClientAccountants")
+  accountantCollaborators    AccountantCollaborator[]  @relation("AccountantCollaborators")
+  collaboratorAccountants    AccountantCollaborator[]  @relation("CollaboratorAccountants")
+  auditLogs                  AuditLog[]
+  bankAccounts               BankAccount[]
+  conversationParticipants   ConversationParticipant[]
+  uploadedDocuments          Document[]                @relation("DocumentUploader")
+  ownedDocuments             Document[]                @relation("DocumentOwner")
+  documentAnnotations        DocumentAnnotation[]
+  ownedFolders               Folder[]                  @relation("FolderOwner")
+  invoiceCorrections         InvoiceCorrection[]       @relation("InvoiceCorrector")
+  accountantMeetings         Meeting[]                 @relation("AccountantMeetings")
+  accountantLeaves           AccountantLeave[]         @relation("AccountantLeaves")
+  clientMeetings             Meeting[]                 @relation("ClientMeetings")
+  meetingActions             MeetingAction[]           @relation("MeetingActionAssignee")
+  meetingNotes               MeetingNote[]
+  sentMessages               Message[]
+  messageReads               MessageRead[]
+  notifications              Notification[]
+  ownedOrganizations         Organization[]            @relation("OrganizationOwner")
+  organizationMembers        OrganizationMember[]
+  refreshTokens              RefreshToken[]
+  accountantRequests         Request[]                 @relation("AccountantRequests")
+  clientRequests             Request[]                 @relation("ClientRequests")
+  createdRequests            Request[]                 @relation("CreatedRequests")
+  requestAttachmentsUploaded RequestAttachment[]       @relation("RequestAttachmentUploader")
+  requestComments            RequestComment[]
+  documentComments           DocumentComment[]
+  accountantReviews          Review[]                  @relation("AccountantReviews")
+  clientReviews              Review[]                  @relation("ClientReviews")
+  assignedTasks              Task[]                    @relation("TaskAssignees")
+  clientTasks                Task[]                    @relation("ClientTasks")
+  createdTasks               Task[]                    @relation("TaskCreator")
+  taskAttachmentsUploaded    TaskAttachment[]
+  taskComments               TaskComment[]
+  notificationPreferences    NotificationPreference?
+  twoFactorAuth              TwoFactorAuth?
+  folderTemplate             String?                   // Modèle de dossiers personnalisé (JSON)
+  accountantProfile          AccountantProfile?        @relation("AccountantProfile")
+  accountantContacts         AccountantContact[]       @relation("AccountantContacts")
+  clientContacts             AccountantContact[]       @relation("ClientContacts")
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model AccountantClient {
+  id           String @id @default(cuid())
+  accountantId String
+  clientId     String
+  accountant   User   @relation("AccountantClients", fields: [accountantId], references: [id], onDelete: Cascade)
+  client       User   @relation("ClientAccountants", fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@unique([accountantId, clientId])
+  @@index([accountantId])
+  @@index([clientId])
+}
+
+model AccountantCollaborator {
+  id             String @id @default(cuid())
+  accountantId   String
+  collaboratorId String
+  accountant     User   @relation("AccountantCollaborators", fields: [accountantId], references: [id], onDelete: Cascade)
+  collaborator   User   @relation("CollaboratorAccountants", fields: [collaboratorId], references: [id], onDelete: Cascade)
+
+  @@unique([accountantId, collaboratorId])
+  @@index([accountantId])
+  @@index([collaboratorId])
+}
+
+model Document {
+  id             String               @id @default(cuid())
+  name           String
+  type           String
+  size           Int
+  url            String
+  status         Status               @default(PENDING)
+  clientId       String
+  accountantId   String?
+  createdAt      DateTime             @default(now())
+  folderId       String?
+  archived       Boolean              @default(false)
+  category       String?
+  extractedData  String?
+  accountant     User?                @relation("DocumentUploader", fields: [accountantId], references: [id])
+  client         User                 @relation("DocumentOwner", fields: [clientId], references: [id], onDelete: Cascade)
+  folder         Folder?              @relation(fields: [folderId], references: [id])
+  annotations    DocumentAnnotation[]
+  versions       DocumentVersion[]
+  invoices       Invoice[]
+  comments       DocumentComment[]
+  linkedMessages Message[]
+
+  @@index([clientId])
+  @@index([accountantId])
+  @@index([status])
+  @@index([archived])
+  @@index([createdAt])
+}
+
+model DocumentAnnotation {
+  id         String   @id @default(cuid())
+  documentId String
+  content    String
+  authorId   String
+  page       Int?
+  position   String?
+  createdAt  DateTime @default(now())
+  author     User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+  @@index([authorId])
+}
+
+model DocumentComment {
+  id         String   @id @default(cuid())
+  documentId String
+  authorId   String
+  content    String
+  createdAt  DateTime @default(now())
+  author     User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+  @@index([authorId])
+}
+
+model DocumentVersion {
+  id            String   @id @default(cuid())
+  documentId    String
+  versionNumber Int
+  url           String
+  createdAt     DateTime @default(now())
+  document      Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, versionNumber])
+  @@index([documentId])
+}
+
+model Folder {
+  id           String     @id @default(cuid())
+  name         String
+  clientId     String
+  parentId     String?
+  archived     Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  documents    Document[]
+  client       User       @relation("FolderOwner", fields: [clientId], references: [id], onDelete: Cascade)
+  parent       Folder?    @relation("SubFolders", fields: [parentId], references: [id], onDelete: Cascade)
+  subFolders   Folder[]   @relation("SubFolders")
+  relatedTasks Task[]
+
+  @@index([clientId])
+  @@index([parentId])
+  @@index([archived])
+}
+
+model Invoice {
+  id            String              @id @default(cuid())
+  documentId    String
+  vendorName    String?
+  invoiceNumber String?
+  invoiceDate   DateTime?
+  dueDate       DateTime?
+  totalAmount   Float?
+  taxAmount     Float?
+  currency      String?             @default("EUR")
+  status        Status              @default(PENDING)
+  extractedData String?
+  createdAt     DateTime            @default(now())
+  document      Document            @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  corrections   InvoiceCorrection[]
+
+  @@index([documentId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model InvoiceCorrection {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  field       String
+  oldValue    String?
+  newValue    String
+  correctedBy String
+  createdAt   DateTime @default(now())
+  corrector   User     @relation("InvoiceCorrector", fields: [correctedBy], references: [id], onDelete: Cascade)
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+  @@index([correctedBy])
+}
+
+model Task {
+  id              String           @id @default(cuid())
+  title           String
+  description     String?
+  priority        String           @default("MEDIUM")
+  status          Status           @default(PENDING)
+  deadline        DateTime?
+  createdBy       String
+  organizationId  String
+  createdAt       DateTime         @default(now())
+  clientDeadline  DateTime?
+  clientId        String?
+  folderId        String?
+  requestId       String?
+  taskNumber      Int              @default(autoincrement())
+  rejectionReason String?
+  archived        Boolean          @default(false)
+  linkedMessages  Message[]
+  assignees       User[]           @relation("TaskAssignees")
+  client          User?            @relation("ClientTasks", fields: [clientId], references: [id])
+  creator         User             @relation("TaskCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+  folder          Folder?          @relation(fields: [folderId], references: [id])
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  request         Request?         @relation(fields: [requestId], references: [id])
+  attachments     TaskAttachment[]
+  comments        TaskComment[]
+
+  @@index([createdBy])
+  @@index([organizationId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([archived])
+}
+
+model TaskComment {
+  id        String   @id @default(cuid())
+  taskId    String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([authorId])
+}
+
+model TaskAttachment {
+  id         String   @id @default(cuid())
+  taskId     String
+  url        String
+  name       String
+  uploadedBy String
+  createdAt  DateTime @default(now())
+  task       Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  uploader   User     @relation(fields: [uploadedBy], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([uploadedBy])
+}
+
+model Conversation {
+  id           String                    @id @default(cuid())
+  type         String
+  name         String?
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+  participants ConversationParticipant[]
+  messages     Message[]
+
+  @@index([type])
+  @@index([createdAt])
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  conversationId String
+  userId         String
+  joinedAt       DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@index([conversationId])
+  @@index([userId])
+}
+
+model Message {
+  id               String        @id @default(cuid())
+  conversationId   String
+  senderId         String
+  content          String
+  type             String        @default("TEXT")
+  linkedDocumentId String?
+  linkedTaskId     String?
+  linkedRequestId  String?
+  createdAt        DateTime      @default(now())
+  conversation     Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  linkedDocument   Document?     @relation(fields: [linkedDocumentId], references: [id])
+  linkedTask       Task?         @relation(fields: [linkedTaskId], references: [id])
+  linkedRequest    Request?      @relation(fields: [linkedRequestId], references: [id])
+  sender           User          @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  updatedAt        DateTime?     @updatedAt
+  reads            MessageRead[]
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([linkedDocumentId])
+  @@index([linkedTaskId])
+  @@index([linkedRequestId])
+  @@index([createdAt])
+}
+
+model MessageRead {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  readAt    DateTime @default(now())
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+  @@index([messageId])
+  @@index([userId])
+}
+
+model Request {
+  id                String              @id @default(cuid())
+  clientId          String
+  accountantId      String?
+  creatorId         String?
+  type              String
+  description       String
+  urgency           String              @default("NORMAL")
+  status            Status              @default(PENDING)
+  createdAt         DateTime            @default(now())
+  dueDate           DateTime?
+  desiredResponseAt DateTime?
+  respondedAt       DateTime?
+  subject           String?
+  accountant        User?               @relation("AccountantRequests", fields: [accountantId], references: [id])
+  client            User                @relation("ClientRequests", fields: [clientId], references: [id], onDelete: Cascade)
+  creator           User?               @relation("CreatedRequests", fields: [creatorId], references: [id])
+  attachments       RequestAttachment[]
+  comments          RequestComment[]
+  relatedTasks      Task[]
+  linkedMessages    Message[]
+
+  @@index([clientId])
+  @@index([accountantId])
+  @@index([creatorId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model RequestAttachment {
+  id         String   @id @default(cuid())
+  requestId  String
+  url        String
+  name       String
+  mimeType   String   @default("application/octet-stream")
+  size       Int      @default(0)
+  uploadedBy String
+  createdAt  DateTime @default(now())
+  request    Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  uploader   User     @relation("RequestAttachmentUploader", fields: [uploadedBy], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+  @@index([uploadedBy])
+}
+
+model RequestComment {
+  id        String   @id @default(cuid())
+  requestId String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  request   Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+  @@index([authorId])
+}
+
+model Meeting {
+  id              String          @id @default(cuid())
+  title           String
+  type            String
+  status          Status          @default(PENDING)
+  scheduledAt     DateTime
+  duration        Int
+  clientId        String
+  accountantId    String?
+  meetingLink     String?
+  createdAt       DateTime        @default(now())
+  color           String?
+  description     String?
+  guests          String?
+  locationDetail  String?
+  pvUrl           String?
+  subject         String?
+  rejectionReason String?
+  accountant      User?           @relation("AccountantMeetings", fields: [accountantId], references: [id])
+  client          User            @relation("ClientMeetings", fields: [clientId], references: [id], onDelete: Cascade)
+  actions         MeetingAction[]
+  notes           MeetingNote[]
+
+  @@index([clientId])
+  @@index([accountantId])
+  @@index([scheduledAt])
+  @@index([status])
+}
+
+model MeetingAvailability {
+  id              String   @id @default(cuid())
+  userId          String
+  dayOfWeek       Int
+  startTime       String
+  endTime         String
+  meetingDuration Int      @default(30)
+  isActive        Boolean  @default(true)
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, dayOfWeek, startTime])
+  @@index([userId])
+}
+
+model AccountantLeave {
+  id           String   @id @default(cuid())
+  accountantId String
+  startDate    DateTime
+  endDate      DateTime
+  reason       String? 
+  createdAt    DateTime @default(now())
+
+  accountant   User     @relation("AccountantLeaves", fields: [accountantId], references: [id], onDelete: Cascade)
+
+  @@index([accountantId])
+  @@index([startDate])
+}
+
+model MeetingNote {
+  id        String   @id @default(cuid())
+  meetingId String
+  content   String
+  authorId  String
+  createdAt DateTime @default(now())
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  meeting   Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
+  @@index([authorId])
+}
+
+model MeetingAction {
+  id          String    @id @default(cuid())
+  meetingId   String
+  description String
+  assignedTo  String
+  dueDate     DateTime?
+  done        Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  assignee    User      @relation("MeetingActionAssignee", fields: [assignedTo], references: [id], onDelete: Cascade)
+  meeting     Meeting   @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
+  @@index([assignedTo])
+}
+
+model Review {
+  id              String            @id @default(cuid())
+  clientId        String
+  accountantId    String
+  accountantId_profile String?          // Pour lier à AccountantProfile
+  rating          Int
+  comment         String?
+  status          Status            @default(PENDING)
+  hasRelationship Boolean           @default(false) // Vérifie si le client a une relation active
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  accountant      User              @relation("AccountantReviews", fields: [accountantId], references: [id], onDelete: Cascade)
+  client          User              @relation("ClientReviews", fields: [clientId], references: [id], onDelete: Cascade)
+  accountantProfile AccountantProfile? @relation(fields: [accountantId_profile], references: [accountantId], onDelete: Cascade)
+
+  @@unique([clientId, accountantId])
+  @@index([clientId])
+  @@index([accountantId])
+  @@index([accountantId_profile])
+  @@index([status])
+  @@index([hasRelationship])
+}
+
+model AccountantProfile {
+  id                String    @id @default(cuid())
+  accountantId      String    @unique
+  companyName       String?
+  specialties       String[]  @default([])
+  phone             String?
+  email             String?
+  location          String?
+  mapsLink          String?
+  bio               String?
+  yearsExperience   Int?
+  averageRating     Float     @default(0)
+  totalReviews      Int       @default(0)
+  isListed          Boolean   @default(true)
+  profileImageUrl   String?
+  coverImageUrl     String?
+  website           String?
+  // Synchronisation automatique avec fiche networking
+  isNetworkingCard  Boolean   @default(true) // La fiche networking est générée automatiquement
+  networkingCardId  String?   @unique // Référence unique pour la fiche networking
+  lastSyncedAt      DateTime  @default(now())
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  accountant        User      @relation("AccountantProfile", fields: [accountantId], references: [id], onDelete: Cascade)
+  reviews           Review[]  // Accès aux reviews du profil
+
+  @@index([accountantId])
+  @@index([isListed])
+  @@index([isNetworkingCard])
+  @@index([createdAt])
+}
+
+model AccountantContact {
+  id                  String    @id @default(cuid())
+  accountantId        String
+  clientId            String?   // Optionnel: null pour les visiteurs non connectés
+  message             String
+  status              String    @default("UNREAD") // UNREAD, READ, REPLIED
+  // Champs visiteur (pour les contacts sans compte)
+  visitorName         String?
+  visitorEmail        String?
+  visitorPhone        String?
+  visitorCompany      String?
+  visitorSubject      String?
+  // Notification en temps réel
+  notificationSent    Boolean   @default(false)
+  notificationId      String?   // Lien vers la notification créée
+  conversationId      String?   // Lien vers la conversation pour les réponses
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  accountant          User      @relation("AccountantContacts", fields: [accountantId], references: [id], onDelete: Cascade)
+  client              User?     @relation("ClientContacts", fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@unique([accountantId, clientId]) // Un seul contact par paire (clients authentifiés)
+  @@index([accountantId])
+  @@index([clientId])
+  @@index([status])
+  @@index([notificationSent])
+  @@index([conversationId])
+  @@index([createdAt])
+}
+
+model Notification {
+  id              String   @id @default(cuid())
+  userId          String
+  type            String   // CONTACT_REQUEST, REVIEW, MESSAGE, MEETING, etc.
+  title           String
+  message         String
+  read            Boolean  @default(false)
+  linkedId        String?  // ID du client qui a contacté
+  linkedType      String?  // TYPE de notification (ACCOUNTANT_CONTACT, etc.)
+  contactFormId   String?  // Référence au formulaire de contact AccountantContact
+  clientName      String?  // Nom du client qui a contacté (dénormalisé pour rapidité)
+  clientMessage   String?  // Le message du client
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([read])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model NotificationPreference {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  emailDailySummary     Boolean  @default(true)
+  emailMeetingReminders Boolean  @default(true)
+  emailTaskUpdates      Boolean  @default(true)
+  emailNewDocuments     Boolean  @default(true)
+  inAppNotifications    Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  entity    String
+  entityId  String?
+  oldValue  String?
+  newValue  String?
+  ip        String?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([entity])
+  @@index([entityId])
+  @@index([createdAt])
+}
+
+model TwoFactorAuth {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  secret      String
+  backupCodes String?
+  enabled     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Organization {
+  id           String               @id @default(cuid())
+  name         String               @unique
+  ownerId      String
+  storageUsed  Int                  @default(0)
+  storageLimit Int                  @default(1073741824)
+  createdAt    DateTime             @default(now())
+  owner        User                 @relation("OrganizationOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members      OrganizationMember[]
+  storageQuota StorageQuota?
+  tasks        Task[]
+
+  @@index([ownerId])
+}
+
+model OrganizationMember {
+  id             String       @id @default(cuid())
+  organizationId String
+  userId         String
+  role           String       @default("MEMBER")
+  joinedAt       DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([organizationId])
+  @@index([userId])
+}
+
+model StorageQuota {
+  id             String       @id @default(cuid())
+  organizationId String       @unique
+  used           Int          @default(0)
+  limit          Int          @default(1073741824)
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+}
+
+model BankAccount {
+  id           String            @id @default(cuid())
+  bankName     String
+  agency       String?
+  rib          String?
+  accountType  String?
+  pack         String?
+  login        String?
+  password     String?
+  balance      Float             @default(0)
+  currency     String            @default("EUR")
+  userId       String
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions BankTransaction[]
+  statements   BankStatement[]
+
+  @@index([userId])
+}
+
+model BankTransaction {
+  id            String      @id @default(cuid())
+  date          DateTime    @default(now())
+  operation     String
+  details       String?
+  reference     String?
+  amount        Float
+  currency      String      @default("EUR")
+  bankAccountId String
+  createdAt     DateTime    @default(now())
+  bankAccount   BankAccount @relation(fields: [bankAccountId], references: [id], onDelete: Cascade)
+
+  @@index([bankAccountId])
+  @@index([date])
+}
+
+model BankStatement {
+  id            String      @id @default(cuid())
+  name          String
+  url           String?
+  date          DateTime    @default(now())
+  bankAccountId String
+  bankAccount   BankAccount @relation(fields: [bankAccountId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+
+  @@index([bankAccountId])
+}
+
+enum Role {
+  ADMIN
+  COMPTABLE
+  COLLABORATEUR
+  CLIENT
+}
+
+enum Status {
+  PENDING
+  ACTIVE
+  INACTIVE
+  NEEDS_REVIEW
+  DONE
+  REJECTED
+  VALIDATED
+}

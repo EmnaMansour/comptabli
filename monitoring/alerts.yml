@@ -1,0 +1,89 @@
+groups:
+  - name: services
+    rules:
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.job }} down"
+          description: "Le service {{ $labels.instance }} est inaccessible depuis plus d'une minute."
+
+      - alert: OCRServiceHighLatency
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job="ocr-service"}[5m])) by (le)) > 30
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Latence élevée sur le service OCR"
+          description: "Le p95 du temps de réponse de l'OCR dépasse 30 secondes."
+
+      - alert: OCRServiceErrors
+        expr: sum(rate(http_requests_total{job="ocr-service", status=~"5.."}[5m])) / sum(rate(http_requests_total{job="ocr-service"}[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Taux d'erreur élevé sur l'OCR"
+          description: "Plus de 5% des requêtes OCR retournent une erreur 5xx."
+
+  - name: database
+    rules:
+      - alert: PostgresDown
+        expr: pg_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL est down"
+          description: "Le Postgres Exporter ne parvient plus à se connecter à la base de données."
+
+      - alert: PostgresHighConnections
+        expr: sum(pg_stat_activity_count) / sum(pg_settings_max_connections) > 0.80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Connexions PostgreSQL élevées"
+          description: "La base de données utilise plus de 80% des connexions disponibles."
+
+  - name: system
+    rules:
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Utilisation CPU élevée"
+          description: "Le CPU de l'instance {{ $labels.instance }} dépasse 85% depuis 10 minutes."
+
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 90
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Utilisation RAM critique"
+          description: "La mémoire utilisée dépasse 90% sur {{ $labels.instance }}."
+
+      - alert: DiskSpaceWarning
+        expr: 100 - ((node_filesystem_avail_bytes{mountpoint="/"} * 100) / node_filesystem_size_bytes{mountpoint="/"}) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Espace disque faible"
+          description: "L'espace disque est plein à plus de 80%."
+
+  - name: business
+    rules:
+      - alert: CRFModelNotLoaded
+        expr: crf_model_loaded == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Modèle CRF non chargé"
+          description: "Le service OCR n'a pas pu charger le modèle CRF en mémoire."
