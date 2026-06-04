@@ -17,7 +17,7 @@ async function bootstrap() {
   const isProd = process.env.NODE_ENV === 'production';
   app.enableCors({
     origin: isProd
-      ? (process.env.FRONTEND_ORIGIN ?? 'http://localhost:5174')
+      ? (process.env.FRONTEND_ORIGIN ? process.env.FRONTEND_ORIGIN.split(',') : 'http://localhost')
       : (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
           // Vite change souvent de port (5173, 5174, 5175…)
           if (!origin) return callback(null, true);

@@ -44,7 +44,7 @@ services:
       OCR_SERVICE_URL: http://ocr-service:8000
       JWT_SECRET: ${JWT_SECRET:-change_me_in_production}
       NODE_ENV: production
-      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost}
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost,http://10.0.2.15}
     ports:
       - "3000:3000"
     networks:
