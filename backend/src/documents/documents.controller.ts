@@ -13,6 +13,7 @@ import {
   Body,
   Query,
 } from '@nestjs/common';
+import { ApiQuery, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { DocumentsService } from './documents.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -31,12 +32,17 @@ interface RequestWithUser extends Request {
   };
 }
 
+@ApiTags('Documents')
+@ApiBearerAuth()
 @Controller('documents')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class DocumentsController {
   constructor(private readonly documentsService: DocumentsService) {}
 
   @Get()
+  @ApiQuery({ name: 'folderId', required: false, description: 'Filtrer par dossier (optionnel)' })
+  @ApiQuery({ name: 'archived', required: false, description: 'Afficher les documents archivés (true/false)' })
+  @ApiQuery({ name: 'clientId', required: false, description: 'Filtrer par client (optionnel)' })
   findAll(
     @Request() req: RequestWithUser,
     @Query('folderId') folderId?: string,

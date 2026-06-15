@@ -110,12 +110,9 @@ function DashboardComptableLike({ stats }: { stats: DashboardStats | null }) {
         <div className="dashboard-card">
           <div className="dashboard-card-header">
             <span className="dashboard-card-title">Revenus mensuels</span>
-            <select
-              className="form-select"
-              style={{ width: 'auto', padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
-            >
+            <select className="border border-slate-200 rounded-md px-2 py-1 text-sm bg-white cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary-500">
               <option>Cette année</option>
-              <option>2023</option>
+              {/* <option>2026</option> */}
             </select>
           </div>
           <div className="dashboard-card-body">
