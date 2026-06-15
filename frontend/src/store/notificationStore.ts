@@ -39,10 +39,11 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     // Eviter les connexions multiples
     if (get().socket) return;
     
-    // getApiBase retourne '/' ou l'url
-    const base = getApiBase() || 'http://localhost:3000';
+    // En prod, se connecter au même host (proxy Nginx gère /socket.io)
+    // En dev, proxy Vite gère /socket.io
+    const base = getApiBase() || undefined;
     
-    const socket = io(base || undefined, {
+    const socket = io(base, {
       path: '/socket.io',
       auth: {
         token,

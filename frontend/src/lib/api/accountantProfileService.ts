@@ -1,5 +1,5 @@
 import { authFetch } from '../authFetch';
-import { apiErrorMessage } from '../api';
+import { apiErrorMessage, getAssetUrl } from '../api';
 
 export interface AccountantProfileUpdate {
   companyName?: string;
@@ -57,9 +57,5 @@ export const uploadAccountantFile = async (file: File): Promise<string> => {
   
   const data = await parseJson<{ url: string }>(response, 'Impossible de télécharger le fichier');
   
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-  if (data.url.startsWith('http')) {
-    return data.url;
-  }
-  return `${apiUrl}${data.url}`;
+  return getAssetUrl(data.url);
 };

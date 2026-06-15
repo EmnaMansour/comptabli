@@ -1,12 +1,13 @@
 /**
  * En dev, les requêtes passent par le proxy Vite (même origine → pas de CORS).
- * En prod, définir VITE_API_URL (ex. https://api.mondomaine.com).
+ * En prod, les requêtes passent par le proxy Nginx (même origine → pas de CORS).
+ * Définir VITE_API_URL uniquement si le backend est sur un domaine séparé.
  */
 export function getApiBase(): string {
   const envUrl = import.meta.env.VITE_API_URL;
   if (envUrl) return String(envUrl).replace(/\/$/, '');
-  if (import.meta.env.DEV) return '';
-  return 'http://localhost:3000';
+  // En dev ET en prod sans VITE_API_URL : URL relative → proxy Vite/Nginx
+  return '';
 }
 
 export function apiUrl(path: string): string {
