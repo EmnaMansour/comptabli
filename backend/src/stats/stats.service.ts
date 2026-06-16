@@ -40,7 +40,12 @@ export class StatsService {
       this.prisma.invoice.count({ 
         where: { 
           status: Status.PENDING,
-          document: { client: { accountantClients: { some: { accountantId: userId } } } }
+          document: {
+            OR: [
+              { accountantId: userId },
+              { client: { accountantClients: { some: { accountantId: userId } } } }
+            ]
+          }
         } 
       }),
       this.prisma.request.count({ where: { accountantId: userId, status: Status.PENDING } }),
@@ -82,7 +87,12 @@ export class StatsService {
       this.prisma.invoice.count({
         where: {
           status: { in: [Status.VALIDATED, Status.DONE] },
-          document: { client: { accountantClients: { some: { accountantId: userId } } } }
+          document: {
+            OR: [
+              { accountantId: userId },
+              { client: { accountantClients: { some: { accountantId: userId } } } }
+            ]
+          }
         }
       }),
     ]);
