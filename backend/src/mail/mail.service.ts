@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
+import * as fs from 'fs';
 import * as nodemailer from 'nodemailer';
 
 @Injectable()
@@ -92,6 +93,8 @@ export class MailService implements OnModuleInit {
     const subject = 'Comptabli - Bienvenue sur votre compte';
     const loginUrl = `${this.getFrontendBaseUrl()}/login`;
     const logoPath = join(process.cwd(), '../frontend/public/comptabli-logo.png');
+    const logoSrc = fs.existsSync(logoPath) ? 'cid:logo' : `${this.getFrontendBaseUrl()}/comptabli-logo.png`;
+    const attachments = fs.existsSync(logoPath) ? [{ filename: 'logo.png', path: logoPath, cid: 'logo' }] : [];
     
     const credentialsHtml = credentials?.temporaryPassword
       ? `<div style="text-align: left; background: #f8fafc; padding: 20px; border-radius: 8px; margin-top: 24px; border: 1px solid #e2e8f0; max-width: 300px; margin-left: auto; margin-right: auto;">
@@ -122,7 +125,7 @@ export class MailService implements OnModuleInit {
       <body>
           <div style="background-color: #f4f4f5; padding: 40px 20px;">
               <div class="header">
-                  <img src="cid:logo" alt="COMPTABLI" height="36" style="display: block; margin: 0 auto; max-width: 100%; border: none; outline: none;" />
+                  <img src="${logoSrc}" alt="COMPTABLI" height="36" style="display: block; margin: 0 auto; max-width: 100%; border: none; outline: none;" />
               </div>
               <div class="container">
                   <div class="content">
@@ -149,7 +152,7 @@ export class MailService implements OnModuleInit {
     `;
 
     const text = `Bonjour, Votre compte a été créé avec le rôle ${role}. Mot de passe temporaire: ${credentials?.temporaryPassword}`;
-    const sent = await this.sendMail(to, subject, text, html, [{ filename: 'logo.png', path: logoPath, cid: 'logo' }]);
+    const sent = await this.sendMail(to, subject, text, html, attachments);
     return { sent };
   }
 
@@ -161,6 +164,9 @@ export class MailService implements OnModuleInit {
   ): Promise<{ sent: boolean; devPreviewUrl?: string }> {
     const verifyUrl = `${this.getFrontendBaseUrl()}/verify-email?token=${encodeURIComponent(plainToken)}`;
     const subject = 'Comptabli - Confirmez votre adresse e-mail';
+    const logoPath = join(process.cwd(), '../frontend/public/comptabli-logo.png');
+    const logoSrc = fs.existsSync(logoPath) ? 'cid:logo' : `${this.getFrontendBaseUrl()}/comptabli-logo.png`;
+    const attachments = fs.existsSync(logoPath) ? [{ filename: 'logo.png', path: logoPath, cid: 'logo' }] : [];
     const text = `Bonjour,
 
 Merci de vous etre inscrit sur Comptabli (role : ${role}).
@@ -192,7 +198,7 @@ L'equipe Comptabli`;
       <body>
           <div style="background-color: #f4f4f5; padding: 40px 20px;">
               <div class="header">
-                  <img src="cid:logo" alt="COMPTABLI" height="36" style="display: block; margin: 0 auto; max-width: 100%; border: none; outline: none;" />
+                  <img src="${logoSrc}" alt="COMPTABLI" height="36" style="display: block; margin: 0 auto; max-width: 100%; border: none; outline: none;" />
               </div>
               <div class="container">
                   <div class="content">
@@ -220,8 +226,7 @@ L'equipe Comptabli`;
       </html>
     `;
     this.logger.log(`[VERIFICATION EMAIL] Pour: ${to} | Lien: ${verifyUrl}`);
-    const logoPath = join(process.cwd(), '../frontend/public/comptabli-logo.png');
-    const sent = await this.sendMail(to, subject, text, html, [{ filename: 'logo.png', path: logoPath, cid: 'logo' }]);
+    const sent = await this.sendMail(to, subject, text, html, attachments);
     if (!sent) {
       this.logger.warn(
         `[E-mail non envoye - SMTP absent] Lien de verification pour ${to} : ${verifyUrl}`,
@@ -234,6 +239,9 @@ L'equipe Comptabli`;
   async sendPasswordResetEmail(to: string, plainToken: string): Promise<{ sent: boolean; devPreviewUrl?: string }> {
     const resetUrl = `${this.getFrontendBaseUrl()}/reset-password?token=${encodeURIComponent(plainToken)}`;
     const subject = 'Comptabli - Réinitialisation de votre mot de passe';
+    const logoPath = join(process.cwd(), '../frontend/public/comptabli-logo.png');
+    const logoSrc = fs.existsSync(logoPath) ? 'cid:logo' : `${this.getFrontendBaseUrl()}/comptabli-logo.png`;
+    const attachments = fs.existsSync(logoPath) ? [{ filename: 'logo.png', path: logoPath, cid: 'logo' }] : [];
     const text = `Bonjour,
 
 Vous avez demandé la réinitialisation de votre mot de passe sur Comptabli.
@@ -263,7 +271,7 @@ L'équipe Comptabli`;
       <body>
           <div style="background-color: #f4f4f5; padding: 40px 20px;">
               <div class="header">
-                  <img src="cid:logo" alt="COMPTABLI" height="36" style="display: block; margin: 0 auto; max-width: 100%; border: none; outline: none;" />
+                  <img src="${logoSrc}" alt="COMPTABLI" height="36" style="display: block; margin: 0 auto; max-width: 100%; border: none; outline: none;" />
               </div>
               <div class="container">
                   <div class="content">
@@ -291,8 +299,7 @@ L'équipe Comptabli`;
       </html>
     `;
     this.logger.log(`[PASSWORD RESET EMAIL] Pour: ${to} | Lien: ${resetUrl}`);
-    const logoPath = join(process.cwd(), '../frontend/public/comptabli-logo.png');
-    const sent = await this.sendMail(to, subject, text, html, [{ filename: 'logo.png', path: logoPath, cid: 'logo' }]);
+    const sent = await this.sendMail(to, subject, text, html, attachments);
     if (!sent) {
       this.logger.warn(`[E-mail non envoye - SMTP absent] Lien de réinitialisation pour ${to} : ${resetUrl}`);
       return { sent: false, devPreviewUrl: resetUrl };
@@ -315,6 +322,8 @@ L'équipe Comptabli`;
     const subject = `Comptabli - Invitation : ${meeting.title}`;
     const loginUrl = `${this.getFrontendBaseUrl()}/login`;
     const logoPath = join(process.cwd(), '../frontend/public/comptabli-logo.png');
+    const logoSrc = fs.existsSync(logoPath) ? 'cid:logo' : `${this.getFrontendBaseUrl()}/comptabli-logo.png`;
+    const attachments = fs.existsSync(logoPath) ? [{ filename: 'logo.png', path: logoPath, cid: 'logo' }] : [];
 
     const typeLabel =
       meeting.type === 'VIRTUAL' ? '💻 Visioconférence'
@@ -348,7 +357,7 @@ L'équipe Comptabli`;
       <body>
           <div style="background-color: #f4f4f5; padding: 40px 20px;">
               <div class="header">
-                  <img src="cid:logo" alt="COMPTABLI" height="36" style="display: block; margin: 0 auto; max-width: 100%; border: none; outline: none;" />
+                  <img src="${logoSrc}" alt="COMPTABLI" height="36" style="display: block; margin: 0 auto; max-width: 100%; border: none; outline: none;" />
               </div>
               <div class="container">
                   <div class="content">
@@ -380,7 +389,7 @@ L'équipe Comptabli`;
       </html>
     `;
 
-    const sent = await this.sendMail(to, subject, text, html, [{ filename: 'logo.png', path: logoPath, cid: 'logo' }]);
+    const sent = await this.sendMail(to, subject, text, html, attachments);
     return { sent };
   }
 }
