@@ -43,7 +43,7 @@ export class InvoicesService {
           taxAmount: data.taxAmount,
           currency: data.currency,
           extractedData: data.extractedData,
-          status: Status.PENDING,
+          status: Status.VALIDATED,
         }
       });
     }
@@ -51,7 +51,7 @@ export class InvoicesService {
     return this.prisma.invoice.create({
       data: {
         ...data,
-        status: Status.PENDING,
+        status: Status.VALIDATED,
       },
     });
   }

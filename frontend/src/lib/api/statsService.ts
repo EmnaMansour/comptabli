@@ -19,6 +19,7 @@ export type DashboardStats = {
   // Accountant stats
   clients?: number;
   pendingInvoices?: number;
+  syncedInvoices?: number;
   todayMeetings?: number;
   recentClients?: { name: string; sector: string; status: string; date: string }[];
   upcomingTasks?: { title: string; assignee: string; due: string; priority: string }[];

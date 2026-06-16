@@ -87,9 +87,6 @@ export class UsersService {
           clientId: user.id,
         },
       });
-
-      // Create professional folder model for the new client
-      await this.createBaseAccountingModel(user.id, accountantId);
     } else if (accountantId && role === Role.COLLABORATEUR) {
       await this.prisma.accountantCollaborator.create({
         data: {
@@ -97,6 +94,11 @@ export class UsersService {
           collaboratorId: user.id,
         },
       });
+    }
+
+    if (role === Role.CLIENT) {
+      // Create folder model for the new client (unconditionally)
+      await this.createBaseAccountingModel(user.id, accountantId);
     }
 
     let mailSent = false;
@@ -582,14 +584,11 @@ export class UsersService {
    */
   async createBaseAccountingModel(clientId: string, accountantId?: string) {
     let model = [
-      { name: '01. Ventes', children: ['Factures Clients', 'Avoirs'] },
-      { name: '02. Achats', children: ['Factures Fournisseurs', 'Notes de frais', 'Avoirs'] },
-      { name: '03. Banque', children: ['Relevés Bancaires', 'Justificatifs de paiement'] },
-      { name: '04. Social & RH', children: ['Bulletins de paie', 'Contrats de travail', 'Charges Sociales'] },
-      { name: '05. Fiscal', children: ['Déclarations TVA', 'IS / IR', 'Autres taxes'] },
-      { name: '06. Juridique', children: ['Statuts', 'Extraits Kbis', 'Assemblées Générales'] },
-      { name: '07. Permanent', children: ['Baux commerciaux', 'Assurances', 'Contrats divers'] },
-      { name: '08. Op. Diverses', children: [] },
+      { name: 'Achat', children: [] },
+      { name: 'Op.diverses', children: [] },
+      { name: 'Caisse', children: [] },
+      { name: 'Vente', children: [] },
+      { name: 'Banque', children: [] },
     ];
 
     if (accountantId) {

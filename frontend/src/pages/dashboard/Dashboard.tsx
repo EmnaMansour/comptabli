@@ -6,6 +6,7 @@ import {
   Users,
   FileText,
   CheckSquare,
+  RefreshCw,
   MessageCircle,
   ArrowUpRight,
   ClipboardList,
@@ -80,11 +81,11 @@ function DashboardComptableLike({ stats }: { stats: DashboardStats | null }) {
         <div className="stat-card green animate-fade-in-up stagger-2">
           <div className="stat-card-header">
             <div className="stat-card-icon green">
-              <FileText size={22} />
+              <RefreshCw size={22} />
             </div>
           </div>
-          <div className="stat-card-value">{stats?.pendingInvoices ?? 0}</div>
-          <div className="stat-card-label">Factures à traiter</div>
+          <div className="stat-card-value">{stats?.syncedInvoices ?? 0}</div>
+          <div className="stat-card-label">Factures synchronisées</div>
         </div>
         <div className="stat-card orange animate-fade-in-up stagger-3">
           <div className="stat-card-header">
@@ -286,14 +287,14 @@ function DashboardClient({ stats }: { stats: DashboardStats | null }) {
           <div className="stat-card-value">{stats?.documents ?? 0}</div>
           <div className="stat-card-label">Mes documents</div>
         </div>
-        <div className="stat-card green animate-fade-in-up stagger-2">
+          <div className="stat-card green animate-fade-in-up stagger-2">
           <div className="stat-card-header">
             <div className="stat-card-icon green">
-              <CheckSquare size={22} />
+              <RefreshCw size={22} />
             </div>
           </div>
           <div className="stat-card-value">{stats?.invoices?.count ?? 0}</div>
-          <div className="stat-card-label">Factures payées</div>
+          <div className="stat-card-label">Factures synchronisées</div>
         </div>
         <div className="stat-card orange animate-fade-in-up stagger-3">
           <div className="stat-card-header">

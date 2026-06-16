@@ -11,7 +11,7 @@ export class StatsService {
       this.prisma.document.count({ where: { clientId: userId } }),
       this.prisma.folder.count({ where: { clientId: userId } }),
       this.prisma.invoice.aggregate({
-        where: { document: { clientId: userId }, status: Status.ACTIVE },
+        where: { document: { clientId: userId }, status: { in: [Status.VALIDATED, Status.DONE] } },
         _sum: { totalAmount: true },
         _count: { id: true },
       }),
@@ -35,7 +35,7 @@ export class StatsService {
   }
 
   async getAccountantStats(userId: string) {
-    const [clientCount, pendingInvoices, pendingRequests, todayMeetings, recentClients, upcomingTasks, invoices, allClients] = await Promise.all([
+    const [clientCount, pendingInvoices, pendingRequests, todayMeetings, recentClients, upcomingTasks, invoices, allClients, syncedInvoices] = await Promise.all([
       this.prisma.accountantClient.count({ where: { accountantId: userId } }),
       this.prisma.invoice.count({ 
         where: { 
@@ -78,7 +78,13 @@ export class StatsService {
       this.prisma.accountantClient.findMany({
         where: { accountantId: userId },
         select: { client: { select: { activitySector: true } } }
-      })
+      }),
+      this.prisma.invoice.count({
+        where: {
+          status: { in: [Status.VALIDATED, Status.DONE] },
+          document: { client: { accountantClients: { some: { accountantId: userId } } } }
+        }
+      }),
     ]);
 
     // Format revenue data (last 9 months including current)
@@ -118,6 +124,7 @@ export class StatsService {
     return {
       clients: clientCount,
       pendingInvoices,
+      syncedInvoices,
       pendingRequests,
       todayMeetings,
       recentClients: recentClients.map(rc => ({
