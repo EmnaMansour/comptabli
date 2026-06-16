@@ -627,6 +627,24 @@ export class UsersService {
     }
   }
 
+  async patchClientFolders() {
+    const clients = await this.prisma.user.findMany({
+      where: { role: Role.CLIENT },
+    });
+    const defaultFolders = ['Achat', 'Op.diverses', 'Caisse', 'Vente', 'Banque'];
+    let patchedClients = 0;
+    for (const client of clients) {
+      const folderCount = await this.prisma.folder.count({ where: { clientId: client.id } });
+      if (folderCount === 0) {
+        for (const name of defaultFolders) {
+          await this.prisma.folder.create({ data: { name, clientId: client.id } });
+        }
+        patchedClients++;
+      }
+    }
+    return { ok: true, patchedClients };
+  }
+
   async changePassword(userId: string, newPassword: string) {
     const hashedPassword = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
     await this.prisma.user.update({
