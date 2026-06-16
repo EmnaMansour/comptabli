@@ -1,4 +1,4 @@
-﻿name: Comptabli Full CI/CD Pipeline
+name: Comptabli Full CI/CD Pipeline
 
 on:
   push:
@@ -241,6 +241,12 @@ jobs:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           NODE_ENV: production
+          FRONTEND_URL: http://comptabli.tn
+          SMTP_HOST: smtp.gmail.com
+          SMTP_PORT: 465
+          SMTP_SECURE: true
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
       - name: Verify deployment
         run: |
           echo "=== Conteneurs en cours d'exécution ==="

@@ -44,7 +44,13 @@ services:
       OCR_SERVICE_URL: http://ocr-service:8000
       JWT_SECRET: ${JWT_SECRET:-change_me_in_production}
       NODE_ENV: production
-      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://comptabli.tn}
+      FRONTEND_URL: ${FRONTEND_URL:-http://comptabli.tn}
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_SECURE: ${SMTP_SECURE:-true}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      MAIL_FROM: ${MAIL_FROM:-"Comptabli <noreply@comptabli.tn>"}
     ports:
       - "3000:3000"
     networks:
