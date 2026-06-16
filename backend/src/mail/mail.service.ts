@@ -92,10 +92,11 @@ export class MailService implements OnModuleInit {
   ): Promise<{ sent: boolean }> {
     const subject = 'Comptabli - Bienvenue sur votre compte';
     const loginUrl = `${this.getFrontendBaseUrl()}/login`;
-    const logoPath = join(process.cwd(), '../frontend/public/comptabli-logo.png');
-    const logoSrc = fs.existsSync(logoPath) ? 'cid:logo' : `${this.getFrontendBaseUrl()}/comptabli-logo.png`;
-    const attachments = fs.existsSync(logoPath) ? [{ filename: 'logo.png', path: logoPath, cid: 'logo' }] : [];
-    
+    const logoPath = join(process.cwd(), 'assets', 'comptabli-logo.png');
+    // Le logo est maintenant embarqué dans le conteneur backend
+    const logoSrc = 'cid:logo';
+    const attachments = [{ filename: 'logo.png', path: logoPath, cid: 'logo' }];
+
     const credentialsHtml = credentials?.temporaryPassword
       ? `<div style="text-align: left; background: #f8fafc; padding: 20px; border-radius: 8px; margin-top: 24px; border: 1px solid #e2e8f0; max-width: 300px; margin-left: auto; margin-right: auto;">
            <p style="margin: 0; font-size: 13px; color: #64748b; font-weight: 600; text-transform: uppercase;">Vos identifiants de connexion</p>
@@ -164,9 +165,9 @@ export class MailService implements OnModuleInit {
   ): Promise<{ sent: boolean; devPreviewUrl?: string }> {
     const verifyUrl = `${this.getFrontendBaseUrl()}/verify-email?token=${encodeURIComponent(plainToken)}`;
     const subject = 'Comptabli - Confirmez votre adresse e-mail';
-    const logoPath = join(process.cwd(), '../frontend/public/comptabli-logo.png');
-    const logoSrc = fs.existsSync(logoPath) ? 'cid:logo' : `${this.getFrontendBaseUrl()}/comptabli-logo.png`;
-    const attachments = fs.existsSync(logoPath) ? [{ filename: 'logo.png', path: logoPath, cid: 'logo' }] : [];
+    const logoPath = join(process.cwd(), 'assets', 'comptabli-logo.png');
+    const logoSrc = 'cid:logo';
+    const attachments = [{ filename: 'logo.png', path: logoPath, cid: 'logo' }];
     const text = `Bonjour,
 
 Merci de vous etre inscrit sur Comptabli (role : ${role}).
@@ -239,9 +240,9 @@ L'equipe Comptabli`;
   async sendPasswordResetEmail(to: string, plainToken: string): Promise<{ sent: boolean; devPreviewUrl?: string }> {
     const resetUrl = `${this.getFrontendBaseUrl()}/reset-password?token=${encodeURIComponent(plainToken)}`;
     const subject = 'Comptabli - Réinitialisation de votre mot de passe';
-    const logoPath = join(process.cwd(), '../frontend/public/comptabli-logo.png');
-    const logoSrc = fs.existsSync(logoPath) ? 'cid:logo' : `${this.getFrontendBaseUrl()}/comptabli-logo.png`;
-    const attachments = fs.existsSync(logoPath) ? [{ filename: 'logo.png', path: logoPath, cid: 'logo' }] : [];
+    const logoPath = join(process.cwd(), 'assets', 'comptabli-logo.png');
+    const logoSrc = 'cid:logo';
+    const attachments = [{ filename: 'logo.png', path: logoPath, cid: 'logo' }];
     const text = `Bonjour,
 
 Vous avez demandé la réinitialisation de votre mot de passe sur Comptabli.

@@ -42,6 +42,9 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/prisma.config.js ./
 
+# Copier les assets (incluant le logo)
+COPY --from=builder /app/assets ./assets
+
 # Donner les permissions à l'utilisateur
 RUN chown -R nestuser:nodejs /app
 
