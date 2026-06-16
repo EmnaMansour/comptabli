@@ -49,7 +49,7 @@ describe('InvoicesService', () => {
         data: { status: Status.VALIDATED },
       });
       expect(prisma.invoice.create).toHaveBeenCalledWith({
-        data: { ...mockData, status: Status.PENDING },
+        data: { ...mockData, status: Status.VALIDATED },
       });
       expect(result.id).toBe('inv-1');
     });
@@ -67,7 +67,7 @@ describe('InvoicesService', () => {
         where: { id: 'inv-1' },
         data: expect.objectContaining({
           vendorName: 'EDF',
-          status: Status.PENDING,
+          status: Status.VALIDATED,
         }),
       });
       expect(result.id).toBe('inv-1');
