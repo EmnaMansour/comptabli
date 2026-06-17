@@ -7,7 +7,7 @@ export class StatsService {
   constructor(private prisma: PrismaService) {}
 
   async getClientStats(userId: string) {
-    const [docCount, folderCount, invoiceSummary, pendingRequests, nextMeeting] = await Promise.all([
+    const [docCount, folderCount, invoiceSummary, pendingRequests, nextMeeting, recentDocs, allInvoices, allDocs] = await Promise.all([
       this.prisma.document.count({ where: { clientId: userId } }),
       this.prisma.folder.count({ where: { clientId: userId } }),
       this.prisma.invoice.aggregate({
@@ -20,7 +20,90 @@ export class StatsService {
         where: { clientId: userId, scheduledAt: { gte: new Date() }, status: Status.ACTIVE },
         orderBy: { scheduledAt: 'asc' },
       }),
+      this.prisma.document.findMany({
+        where: { clientId: userId },
+        orderBy: { createdAt: 'desc' },
+        take: 5
+      }),
+      this.prisma.invoice.findMany({
+        where: { document: { clientId: userId }, status: { in: [Status.VALIDATED, Status.DONE] } },
+        select: { invoiceDate: true, createdAt: true, totalAmount: true }
+      }),
+      this.prisma.document.findMany({
+        where: { clientId: userId },
+        select: { type: true }
+      })
     ]);
+
+    // Format revenue (expense) Data
+    const monthNames = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
+    const expenseMap = new Map<number, number>();
+    allInvoices.forEach(inv => {
+      const date = inv.invoiceDate || inv.createdAt;
+      if (date && inv.totalAmount) {
+        const month = date.getMonth();
+        expenseMap.set(month, (expenseMap.get(month) || 0) + inv.totalAmount);
+      }
+    });
+
+    let expenseData = [];
+    const currentMonth = new Date().getMonth();
+    for (let i = 8; i >= 0; i--) {
+      let m = currentMonth - i;
+      if (m < 0) m += 12;
+      expenseData.push({
+        name: monthNames[m],
+        value: expenseMap.get(m) || 0
+      });
+    }
+
+    // Pie data
+    const typeCount: Record<string, number> = {};
+    allDocs.forEach(d => {
+      let type = 'Autres';
+      if (d.type.includes('pdf')) type = 'PDF';
+      else if (d.type.includes('image')) type = 'Images';
+      else if (d.type.includes('spreadsheet') || d.type.includes('excel')) type = 'Tableurs';
+      typeCount[type] = (typeCount[type] || 0) + 1;
+    });
+
+    let pieData = Object.entries(typeCount).map(([name, value]) => ({ name, value }));
+
+    // ✨ DEMO MOCK FOR EMPTY ACCOUNTS (for PFE presentations)
+    if (docCount === 0 && pendingRequests === 0) {
+      expenseData = [
+        { name: monthNames[(currentMonth - 8 + 12) % 12], value: 1200 },
+        { name: monthNames[(currentMonth - 7 + 12) % 12], value: 1800 },
+        { name: monthNames[(currentMonth - 6 + 12) % 12], value: 1500 },
+        { name: monthNames[(currentMonth - 5 + 12) % 12], value: 2400 },
+        { name: monthNames[(currentMonth - 4 + 12) % 12], value: 1900 },
+        { name: monthNames[(currentMonth - 3 + 12) % 12], value: 2100 },
+        { name: monthNames[(currentMonth - 2 + 12) % 12], value: 2800 },
+        { name: monthNames[(currentMonth - 1 + 12) % 12], value: 2600 },
+        { name: monthNames[currentMonth], value: 3100 },
+      ];
+      pieData = [
+        { name: 'Factures', value: 45 },
+        { name: 'Contrats', value: 15 },
+        { name: 'Relevés', value: 25 },
+        { name: 'Autres', value: 15 }
+      ];
+      return {
+        documents: 24,
+        folders: 5,
+        invoices: { count: 12, totalAmount: 4520.50 },
+        pendingRequests: 3,
+        nextMeeting: { title: 'Bilan Trimestriel', scheduledAt: new Date(Date.now() + 86400000) },
+        revenueData: expenseData,
+        pieData,
+        recentActivity: [
+          { name: 'Facture_Avril_2026.pdf', type: 'Uploadé', date: new Date().toISOString() },
+          { name: 'Contrat de prestation', type: 'Signature demandée', date: new Date(Date.now() - 86400000).toISOString() },
+          { name: 'Bilan 2025.pdf', type: 'Validé', date: new Date(Date.now() - 172800000).toISOString() },
+          { name: 'Relevé bancaire', type: 'Téléchargé', date: new Date(Date.now() - 272800000).toISOString() }
+        ]
+      };
+    }
 
     return {
       documents: docCount,
@@ -31,6 +114,13 @@ export class StatsService {
       },
       pendingRequests,
       nextMeeting,
+      revenueData: expenseData,
+      pieData,
+      recentActivity: recentDocs.map(d => ({
+        name: d.name,
+        type: d.status === 'PENDING' ? 'En cours' : 'Validé',
+        date: d.createdAt.toISOString()
+      }))
     };
   }
 

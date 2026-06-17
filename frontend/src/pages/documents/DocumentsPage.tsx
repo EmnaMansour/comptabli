@@ -99,6 +99,24 @@ export default function DocumentsPage() {
     }
   };
 
+  const handleDownload = async (url: string, name: string) => {
+    try {
+      const res = await fetch(getAssetUrl(url));
+      if (!res.ok) throw new Error('Network error');
+      const blob = await res.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(blobUrl);
+      document.body.removeChild(a);
+    } catch (e) {
+      alert("Erreur lors du téléchargement du fichier.");
+    }
+  };
+
   const filtered = documents.filter(d => d.name.toLowerCase().includes(search.toLowerCase()));
 
   return (
@@ -180,7 +198,7 @@ export default function DocumentsPage() {
                   <td style={{ padding: '1rem' }}>
                     <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                       <a href={getAssetUrl(d.url)} target="_blank" rel="noreferrer" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', padding: '0.25rem', display: 'inline-flex', alignItems: 'center' }} title="Voir"><Eye size={18} /></a>
-                      <a href={getAssetUrl(d.url)} download style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', padding: '0.25rem', display: 'inline-flex', alignItems: 'center' }} title="Télécharger"><Download size={18} /></a>
+                      <button onClick={(e) => { e.preventDefault(); handleDownload(d.url, d.name); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', padding: '0.25rem', display: 'inline-flex', alignItems: 'center' }} title="Télécharger"><Download size={18} /></button>
                       <button onClick={() => handleDelete(d.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', padding: '0.25rem', display: 'inline-flex', alignItems: 'center' }} title="Supprimer"><Trash2 size={18} /></button>
                     </div>
                   </td>

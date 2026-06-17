@@ -16,6 +16,7 @@ export type DashboardStats = {
     scheduledAt: string;
     title: string;
   };
+  recentActivity?: { name: string; type: string; date: string }[];
   // Accountant stats
   clients?: number;
   pendingInvoices?: number;

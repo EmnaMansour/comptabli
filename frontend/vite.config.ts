@@ -16,7 +16,7 @@ export default defineConfig({
         changeOrigin: true,
         ws: true,
         bypass: (req: any) => {
-          if (req.url.startsWith('/uploads')) return null;
+          if (req.url.startsWith('/uploads') || req.url.includes('/api/')) return null;
           if (req.headers.accept && req.headers.accept.indexOf('text/html') !== -1) {
             return '/index.html';
           }

@@ -59,15 +59,42 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="animate-fade-in ws-page">
-      <div className="ws-top-bar" style={{ marginBottom: '2.5rem', alignItems: 'center' }}>
-        <div className="ws-title-block">
-          <h1 className="page-title">Tableau de Bord</h1>
-          <p className="page-subtitle">Aperçu global de la performance et des indicateurs clés de la plateforme.</p>
+      {/* Hero banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e40af 50%, #3b82f6 100%)',
+        borderRadius: '16px',
+        padding: '28px 32px',
+        marginBottom: '28px',
+        color: '#fff',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 24,
+        boxShadow: '0 8px 32px -8px rgba(59, 130, 246, 0.45)',
+        flexWrap: 'wrap',
+      }}>
+        <div>
+          <div style={{ fontSize: '0.8rem', fontWeight: 600, opacity: 0.75, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+            Tableau de bord
+          </div>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: 8 }}>
+            Bienvenue sur l'espace administrateur
+          </h2>
+          <p style={{ opacity: 0.85, fontSize: '0.9rem', maxWidth: 460, lineHeight: 1.6 }}>
+            Aperçu global de la performance, gestion des utilisateurs et surveillance des indicateurs clés de la plateforme.
+          </p>
         </div>
-        <div className="ws-actions">
-           <button className="ws-btn-outline" onClick={() => window.location.reload()}>
-             Rafraîchir les données
-           </button>
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          <button onClick={() => window.location.reload()} style={{
+            background: '#fff', color: '#1e40af', border: 'none',
+            borderRadius: '10px', padding: '10px 20px', cursor: 'pointer',
+            fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none', transition: 'opacity 0.2s',
+          }}
+          onMouseEnter={e => e.currentTarget.style.opacity = '0.9'}
+          onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+          >
+            Rafraîchir les données
+          </button>
         </div>
       </div>
 
@@ -198,30 +225,38 @@ export default function AdminDashboardPage() {
               <div className="dashboard-card-header" style={{ border: 'none', padding: '0.5rem 0.5rem 1.5rem' }}>
                 <span className="dashboard-card-title" style={{ fontSize: '1.15rem', fontWeight: 800 }}>Journal d'audit récent</span>
               </div>
-              <div className="dashboard-card-body" style={{ padding: 0 }}>
-                <div style={{ display: 'grid', gap: 1 }}>
-                  {data.recentAuditLogs.map((log) => (
-                    <div 
-                      key={log.id} 
-                      style={{ 
-                        padding: '1rem 0.5rem', 
-                        borderBottom: '1px solid #f1f5f9',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
-                      }}
-                    >
-                      <div>
-                        <div style={{ fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>{log.action}</div>
-                        <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{log.entity} • {log.user?.email ?? 'Système'}</div>
+              <div className="dashboard-card-body" style={{ padding: data.recentAuditLogs.length === 0 ? '2rem 1rem' : 0 }}>
+                {data.recentAuditLogs.length === 0 ? (
+                  <div style={{ textAlign: 'center', color: '#94a3b8' }}>
+                    <AlertTriangle size={32} style={{ margin: '0 auto 12px', opacity: 0.5 }} />
+                    <div style={{ fontWeight: 600, color: '#475569', marginBottom: 4 }}>Aucun événement récent</div>
+                    <div style={{ fontSize: '0.85rem' }}>Les actions systémiques apparaîtront ici.</div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gap: 1 }}>
+                    {data.recentAuditLogs.map((log) => (
+                      <div 
+                        key={log.id} 
+                        style={{ 
+                          padding: '1rem 0.5rem', 
+                          borderBottom: '1px solid #f1f5f9',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center'
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>{log.action}</div>
+                          <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{log.entity} • {log.user?.email ?? 'Système'}</div>
+                        </div>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textAlign: 'right' }}>
+                          {new Date(log.createdAt).toLocaleDateString()}
+                          <div style={{ fontWeight: 400, fontSize: '0.7rem', opacity: 0.7 }}>{new Date(log.createdAt).toLocaleTimeString()}</div>
+                        </div>
                       </div>
-                      <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textAlign: 'right' }}>
-                        {new Date(log.createdAt).toLocaleDateString()}
-                        <div style={{ fontWeight: 400, fontSize: '0.7rem', opacity: 0.7 }}>{new Date(log.createdAt).toLocaleTimeString()}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

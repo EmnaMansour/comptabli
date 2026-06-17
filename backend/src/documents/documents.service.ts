@@ -331,6 +331,19 @@ export class DocumentsService {
       throw new ForbiddenException('Vous n’avez pas l’autorisation de supprimer ce document');
     }
 
+    // Effacer le fichier physique s'il existe dans le dossier uploads
+    if (doc.url && doc.url.startsWith('/uploads/')) {
+      const filename = doc.url.replace('/uploads/', '');
+      const filePath = join(process.cwd(), 'backend', 'uploads', filename);
+      try {
+        if (existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      } catch (err) {
+        console.error(`Erreur lors de la suppression du fichier ${filePath}:`, err);
+      }
+    }
+
     await this.prisma.document.delete({ where: { id: documentId } });
     return { ok: true };
   }
