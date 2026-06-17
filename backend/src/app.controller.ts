@@ -213,6 +213,32 @@ export class AppController {
     return 'OK';
   }
 
+  @Get('patch-folders')
+  async patchFolders() {
+    console.log('--- Début de la mise à jour des dossiers ---');
+    const clients = await this.prisma.user.findMany({
+      where: { role: 'CLIENT' }
+    });
+    
+    let updatedCount = 0;
+    const defaultFolders = ['Achat', 'Op.diverses', 'Caisse', 'Vente', 'Banque'];
+
+    for (const client of clients) {
+      const folderCount = await this.prisma.folder.count({
+        where: { clientId: client.id }
+      });
+      if (folderCount === 0) {
+        for (const name of defaultFolders) {
+          await this.prisma.folder.create({
+            data: { name, clientId: client.id }
+          });
+        }
+        updatedCount++;
+      }
+    }
+    return { ok: true, patchedClients: updatedCount };
+  }
+
   @Get('fix-reviews')
   async fixReviews() {
     const reviews = await this.prisma.review.updateMany({

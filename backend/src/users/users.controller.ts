@@ -63,11 +63,6 @@ export class UsersController {
     return this.usersService.findById(req.user.userId);
   }
 
-  @Get('patch-folders')
-  patchFolders() {
-    return this.usersService.patchClientFolders();
-  }
-
   @Get('messaging-directory')
   getMessagingDirectory(@Request() req: RequestWithUser) {
     return this.usersService.messagingDirectory(req.user.userId, req.user.role);
