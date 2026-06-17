@@ -158,15 +158,6 @@ jest.mock('./src/lib/api/reviewContactService', () => ({
   rejectReview: jest.fn().mockResolvedValue({ ok: true }),
 }));
 
-jest.mock('./src/lib/api/bankService', () => ({
-  fetchBankAccounts: jest.fn().mockResolvedValue([]),
-  fetchBankAccount: jest.fn().mockResolvedValue(null),
-  createBankAccount: jest.fn().mockResolvedValue({ ok: true }),
-  updateBankAccount: jest.fn().mockResolvedValue({ ok: true }),
-  deleteBankAccount: jest.fn().mockResolvedValue({ ok: true }),
-  addBankTransaction: jest.fn().mockResolvedValue({ ok: true }),
-}));
-
 jest.mock('./src/lib/api/notificationService', () => ({
   fetchNotifications: jest.fn().mockResolvedValue([]),
   markAllRead: jest.fn().mockResolvedValue({ ok: true }),
