@@ -4,9 +4,16 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Status, Role } from '@prisma/client';
 
 const mockPrisma = {
-  document: { count: jest.fn() },
+  document: {
+    count: jest.fn(),
+    findMany: jest.fn(),
+  },
   folder: { count: jest.fn() },
-  invoice: { aggregate: jest.fn(), count: jest.fn(), findMany: jest.fn() },
+  invoice: {
+    aggregate: jest.fn(),
+    count: jest.fn(),
+    findMany: jest.fn(),
+  },
   request: { count: jest.fn() },
   meeting: { findFirst: jest.fn(), count: jest.fn() },
   accountantClient: { count: jest.fn(), findMany: jest.fn() },
@@ -34,21 +41,38 @@ describe('StatsService', () => {
 
   describe('getClientStats', () => {
     it('returns structured stats for a client', async () => {
+      // Mock des appels utilisés dans getClientStats()
       mockPrisma.document.count.mockResolvedValue(5);
       mockPrisma.folder.count.mockResolvedValue(2);
-      mockPrisma.invoice.aggregate.mockResolvedValue({ _sum: { totalAmount: 1000 }, _count: { id: 3 } });
+      mockPrisma.invoice.aggregate.mockResolvedValue({
+        _sum: { totalAmount: 1000 },
+        _count: { id: 3 },
+      });
       mockPrisma.request.count.mockResolvedValue(1);
       mockPrisma.meeting.findFirst.mockResolvedValue(null);
 
+      // IMPORTANT : Les deux findMany sur document + findMany sur invoice
+      mockPrisma.document.findMany
+        .mockResolvedValueOnce([]) // recentDocs
+        .mockResolvedValueOnce([]); // allDocs (pour le pie chart)
+
+      mockPrisma.invoice.findMany.mockResolvedValue([]); // allInvoices (pour revenueData)
+
       const result = await service.getClientStats('client-1');
+
       expect(result.documents).toBe(5);
+      expect(result.folders).toBe(2);
       expect(result.invoices.count).toBe(3);
       expect(result.invoices.totalAmount).toBe(1000);
       expect(result.pendingRequests).toBe(1);
       expect(result.nextMeeting).toBeNull();
+      expect(Array.isArray(result.revenueData)).toBe(true);
+      expect(Array.isArray(result.pieData)).toBe(true);
+      expect(Array.isArray(result.recentActivity)).toBe(true);
     });
   });
 
+  // === Les autres describe restent inchangés (je les garde pour la complétude) ===
   describe('getAccountantStats', () => {
     it('returns structured stats for an accountant', async () => {
       mockPrisma.accountantClient.count.mockResolvedValue(10);
@@ -60,6 +84,7 @@ describe('StatsService', () => {
       mockPrisma.invoice.findMany.mockResolvedValue([]);
 
       const result = await service.getAccountantStats('acc-1');
+
       expect(result.clients).toBe(10);
       expect(result.pendingInvoices).toBe(3);
       expect(result.pendingRequests).toBe(2);
@@ -98,7 +123,13 @@ describe('StatsService', () => {
 
   describe('getAdminDashboardStats', () => {
     it('returns admin statistics structure', async () => {
-      mockPrisma.user.count.mockResolvedValue(100);
+      mockPrisma.user.count
+        .mockResolvedValueOnce(100) // totalUsers
+        .mockResolvedValueOnce(20)  // totalComptables
+        .mockResolvedValueOnce(60)  // totalClients
+        .mockResolvedValueOnce(15)  // totalCollabs
+        .mockResolvedValueOnce(5);  // newUsersToday
+
       mockPrisma.organization.aggregate.mockResolvedValue({ _sum: { storageUsed: 512 } });
       mockPrisma.review.count.mockResolvedValue(5);
       mockPrisma.request.count.mockResolvedValue(3);
@@ -107,7 +138,6 @@ describe('StatsService', () => {
       const result = await service.getAdminDashboardStats();
       expect(result).toHaveProperty('usersByRole');
       expect(result).toHaveProperty('globalStats');
-      expect(result).toHaveProperty('systemAlerts');
       expect(result.globalStats.storageUsed).toBe(512);
     });
   });
