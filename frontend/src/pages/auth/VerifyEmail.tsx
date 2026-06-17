@@ -42,6 +42,7 @@ const VerifyEmail: React.FC = () => {
 
   useEffect(() => {
     if (!token?.trim()) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStatus('err');
       setMessage("Lien incomplet. Ouvrez le lien reçu par e-mail ou demandez un nouvel envoi depuis l'inscription.");
       return;

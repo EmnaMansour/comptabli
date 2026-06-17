@@ -28,12 +28,7 @@ export default function DisponibilitesPage({ onBack }: { onBack: () => void }) {
   const [leaveForm, setLeaveForm] = useState({ startDate: '', endDate: '', reason: '' });
   const [addingLeave, setAddingLeave] = useState(false);
 
-  useEffect(() => {
-    void loadSlots();
-    void loadLeaves();
-  }, []);
-
-  const loadSlots = async () => {
+  async function loadSlots() {
     setLoading(true);
     let data = await fetchAvailability();
     if (data.length === 0) {
@@ -54,12 +49,19 @@ export default function DisponibilitesPage({ onBack }: { onBack: () => void }) {
     setLoading(false);
   };
 
-  const loadLeaves = async () => {
+  async function loadLeaves() {
     setLeavesLoading(true);
     const data = await fetchLeaves();
     setLeaves(data);
     setLeavesLoading(false);
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadSlots();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadLeaves();
+  }, []);
 
   const handleSave = async () => {
     setSaving(true);

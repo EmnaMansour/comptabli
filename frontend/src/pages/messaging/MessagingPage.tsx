@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Send, Paperclip, Search, MessageCircle, MoreVertical, Edit2, Trash2 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import {
@@ -12,10 +12,12 @@ import {
   deleteChatMessage,
   type ChatMessage,
   type MessagingUser,
+  type ConversationPreview,
+  type ConversationDetail,
 } from '../../lib/api/messagingService';
 import { fetchRequests, type AppRequest } from '../../lib/api/requestService';
-import { fetchDocuments, uploadDocument, type AppDocument } from '../../lib/api/documentService';
-import { X, FileText, CheckCircle, Clock, ClipboardList } from 'lucide-react';
+import { uploadDocument } from '../../lib/api/documentService';
+import { X, FileText, ClipboardList } from 'lucide-react';
 import '../../styles/messaging-page.css';
 
 function peerLabel(u: MessagingUser) {
@@ -228,7 +230,7 @@ export default function MessagingPage() {
     setIsUploading(true);
     try {
       const res = await uploadDocument(file, actualClientId); 
-      if (res.ok) {
+      if (res.ok && res.data) {
         await send(res.data.id, 'Document');
       } else {
         alert("Erreur lors de l'envoi du fichier.");

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Search, Eye, Power, MessageCircle, X, FileText } from 'lucide-react';
+import { Plus, Search, Power, MessageCircle, X, FileText } from 'lucide-react';
 import { fetchCollaboratorsStats, createCollaborator, deleteCollaborator, type CollaboratorData } from '../../lib/api/collaboratorService';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/workspace-ui.css';

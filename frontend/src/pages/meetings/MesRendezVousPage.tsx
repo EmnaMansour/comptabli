@@ -8,19 +8,11 @@ import {
   MapPin,
   X,
   Check,
-  Calendar,
   ChevronLeft,
   ChevronRight,
   AlertCircle,
-  Users,
-  Building2,
   Mail,
-  Send,
-  MoreVertical,
-  Edit2,
-  Trash2,
-  MessageCircle,
-  FileText,
+  
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import {
@@ -39,15 +31,6 @@ import DisponibilitesPage from './DisponibilitesPage';
 function personLabel(u?: { firstName: string; lastName: string; companyName?: string | null } | null) {
   if (!u) return '—';
   return u.companyName?.trim() || `${u.firstName} ${u.lastName}`;
-}
-
-function timeLabel(iso: string) {
-  const d = new Date(iso);
-  const h = d.getHours();
-  const m = String(d.getMinutes()).padStart(2, '0');
-  const ampm = h >= 12 ? 'pm' : 'am';
-  const h12 = h % 12 || 12;
-  return `${String(h12).padStart(2, '0')}:${m} ${ampm}`;
 }
 
 function dateTimeLabelDetail(iso: string) {
@@ -202,6 +185,7 @@ export default function MesRendezVousPage() {
       title: '', subject: '', description: '', type: 'VIRTUAL',
       date: '', time: '09:00', duration: '30',
       locationDetail: '', meetingLink: '',
+      physicalSubtype: 'OFFICE',
       clientId: '', accountantId: '', color: '#2563eb',
       guestEmail: '', guests: []
     });
@@ -216,7 +200,14 @@ export default function MesRendezVousPage() {
     const d = new Date(detailMeeting.scheduledAt);
     let parsedGuests: string[] = [];
     if (detailMeeting.guests) {
-      try { parsedGuests = JSON.parse(detailMeeting.guests); } catch(e) {}
+      try { parsedGuests = JSON.parse(detailMeeting.guests); } catch { /* ignore */ }
+    }
+
+    let parsedSubtype: 'OFFICE' | 'CABINET' | 'OTHER' = 'OFFICE';
+    if (detailMeeting.type === 'PHYSICAL') {
+      if (detailMeeting.locationDetail === 'Mon bureau') parsedSubtype = 'OFFICE';
+      else if (detailMeeting.locationDetail === 'Chez le cabinet de comptabilité') parsedSubtype = 'CABINET';
+      else parsedSubtype = 'OTHER';
     }
 
     setForm({
@@ -229,6 +220,7 @@ export default function MesRendezVousPage() {
       duration: String(detailMeeting.duration || 30),
       locationDetail: detailMeeting.locationDetail || '',
       meetingLink: detailMeeting.meetingLink || '',
+      physicalSubtype: parsedSubtype,
       clientId: detailMeeting.clientId || '',
       accountantId: detailMeeting.accountantId || '',
       color: detailMeeting.color || '#2563eb',
@@ -269,7 +261,7 @@ export default function MesRendezVousPage() {
     if (!token || token === 'demo-token') { showToast('err', 'Connexion requise.'); return; }
     
     // Auto-add guest if typed but not added
-    let finalGuests = [...form.guests];
+    const finalGuests = [...form.guests];
     if (form.guestEmail.trim() && form.guestEmail.includes('@')) {
       finalGuests.push(form.guestEmail.trim());
     }

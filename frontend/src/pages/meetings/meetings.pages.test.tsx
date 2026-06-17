@@ -15,7 +15,7 @@ const wrap = (ui: React.ReactElement) => render(<MemoryRouter>{ui}</MemoryRouter
 describe('Meetings Pages', () => {
   it('DisponibilitesPage renders without crashing', async () => {
     await act(async () => {
-      wrap(<DisponibilitesPage />);
+      wrap(<DisponibilitesPage onBack={() => {}} />);
     });
     expect(document.body).toBeTruthy();
   });

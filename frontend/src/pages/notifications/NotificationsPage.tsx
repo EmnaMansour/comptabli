@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Check, X, BellOff, ArrowRight, User as UserIcon, UserPlus, Mail, Settings, CheckSquare, Calendar, FileText } from 'lucide-react';
+import { Bell, Check, X, BellOff, ArrowRight, User as  UserPlus, Mail, CheckSquare, Calendar, FileText } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useNotificationStore, type NotificationType } from '../../store/notificationStore';
 import '../../styles/notifications-page.css';

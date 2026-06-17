@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, MapPin, Video, Phone, Calendar as CalendarIcon, User, Plus } from 'lucide-react';
+import { X, MapPin, Video, Phone, Calendar as CalendarIcon, User, Plus, AlertCircle } from 'lucide-react';
 import { createMeeting } from '../../lib/api/meetingService';
 import { useAuthStore } from '../../store/authStore';
 import BookingCalendar from './BookingCalendar';

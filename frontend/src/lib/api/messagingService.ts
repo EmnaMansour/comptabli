@@ -31,6 +31,7 @@ export type ChatMessage = {
   content: string;
   type: string;
   createdAt: string;
+  updatedAt?: string;
   senderId: string;
   sender: MessagingUser;
   linkedDocument?: { id: string; name: string; url: string };

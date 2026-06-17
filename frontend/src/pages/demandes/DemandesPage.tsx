@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import {
   Plus,
   Search,
@@ -12,13 +12,11 @@ import {
   Check,
   Mail,
   FileText,
-  Download,
-  Send,
   Paperclip,
   ChevronLeft,
   ChevronRight,
   Clock,
-  Share2,
+  Send,
   UserPlus,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
@@ -40,7 +38,6 @@ import {
 import { fetchDocuments, type AppDocument } from '../../lib/api/documentService';
 import { fetchFolders, type Folder } from '../../lib/api/folderService';
 import { fetchMessagingDirectory, type MessagingUser } from '../../lib/api/messagingService';
-import { getAssetUrl } from '../../lib/api';
 import '../../styles/workspace-ui.css';
 import '../../styles/demandes-page.css';
 
@@ -147,7 +144,6 @@ export default function DemandesPage({ forceSection }: { forceSection?: 'my' | '
   // The section is either forced by prop or defaults to 'clients' for staff (though now routes will force it)
   // For clients, it's irrelevant as they only see their own.
   const [staffSection, setStaffSection] = useState<'my' | 'clients'>(forceSection || 'clients');
-  const location = useLocation();
   const [searchParams] = useSearchParams();
   const linkedId = searchParams.get('id');
 
@@ -339,7 +335,7 @@ export default function DemandesPage({ forceSection }: { forceSection?: 'my' | '
     // Fetch folders for this client (or "Mon espace" if no clientId)
     if (token && token !== 'demo-token') {
       try {
-        const folders = await fetchFolders(undefined, r.clientId || undefined);
+        const folders = await fetchFolders({ clientId: r.clientId || undefined });
         setClientFolders(folders);
       } catch (err) {
         console.error("Failed to fetch folders:", err);
@@ -991,7 +987,7 @@ export default function DemandesPage({ forceSection }: { forceSection?: 'my' | '
                         const cid = e.target.value;
                         setAssignReq(prev => prev ? ({ ...prev, clientId: cid }) : null);
                         if (cid) {
-                          const folders = await fetchFolders(undefined, cid);
+                          const folders = await fetchFolders({ clientId: cid });
                           setClientFolders(folders);
                         } else {
                           setClientFolders([]);

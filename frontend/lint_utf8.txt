@@ -1,0 +1,450 @@
+﻿
+> frontend@0.0.0 lint
+> eslint .
+
+
+C:\comptabli\frontend\jest.setup.ts
+  15:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\comptabli\frontend\src\App.test.tsx
+  1:26  warning  'waitFor' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\comptabli\frontend\src\components\auth\ForcePasswordChangeModal.tsx
+   3:10  warning  'Lock' is defined but never used          @typescript-eslint/no-unused-vars
+  60:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\comptabli\frontend\src\components\layout\Header.tsx
+  1:16  warning  'useNavigate' is defined but never used  @typescript-eslint/no-unused-vars
+  2:10  warning  'useCallback' is defined but never used  @typescript-eslint/no-unused-vars
+  2:34  warning  'useRef' is defined but never used       @typescript-eslint/no-unused-vars
+  2:42  warning  'useState' is defined but never used     @typescript-eslint/no-unused-vars
+  4:10  warning  'Bell' is defined but never used         @typescript-eslint/no-unused-vars
+  4:16  warning  'Mail' is defined but never used         @typescript-eslint/no-unused-vars
+  4:28  warning  'X' is defined but never used            @typescript-eslint/no-unused-vars
+
+C:\comptabli\frontend\src\components\layout\Sidebar.tsx
+  28:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\comptabli\frontend\src\components\layout\Sidebar.tsx:28:7
+  26 |       });
+  27 |     } else {
+> 28 |       setClientName('');
+     |       ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  29 |     }
+  30 |   }, [activeClientId]);
+  31 |                                                                                                                                               react-hooks/set-state-in-effect
+  62:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\comptabli\frontend\src\components\layout\Sidebar.tsx:62:7
+  60 |       .map((item) => item.label);
+  61 |     if (labelsToOpen.length) {
+> 62 |       setOpenMenus((prev) => [...new Set([...prev, ...labelsToOpen, 'Mon espace', clientLabel])]);
+     |       ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  63 |     }
+  64 |   }, [location.pathname, navItems, clientLabel]);
+  65 |  react-hooks/set-state-in-effect
+
+C:\comptabli\frontend\src\components\meetings\BookingCalendar.tsx
+  28:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\comptabli\frontend\src\components\meetings\BookingCalendar.tsx:28:5
+  26 |   useEffect(() => {
+  27 |     if (!accountantId) return;
+> 28 |     setLoading(true);
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  29 |     fetchAvailableSlots(accountantId, year, month)
+  30 |       .then(setSlots)
+  31 |       .finally(() => setLoading(false));  react-hooks/set-state-in-effect
+
+C:\comptabli\frontend\src\components\meetings\NewMeetingModal.tsx
+  112:14  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\comptabli\frontend\src\components\networking\ContactAccountantModal.tsx
+  104:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\comptabli\frontend\src\components\networking\ScheduleMeetingModal.tsx
+   19:11  warning  'user' is assigned a value but never used                                                                     @typescript-eslint/no-unused-vars
+   55:6   warning  React Hook useEffect has a missing dependency: 'loadSlots'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  104:19  warning  Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+
+C:\comptabli\frontend\src\components\notifications\NotificationDropdown.tsx
+   3:23  warning  'Maximize2' is defined but never used                @typescript-eslint/no-unused-vars
+   3:88  warning  'Mail' is defined but never used                     @typescript-eslint/no-unused-vars
+  32:10  warning  'clientDetails' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  33:10  warning  'loadingDetails' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\comptabli\frontend\src\lib\api\accountantProfileService.ts
+  37:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  46:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\comptabli\frontend\src\lib\api\documentService.ts
+  132:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\comptabli\frontend\src\lib\api\ocrService.ts
+  15:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  55:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\comptabli\frontend\src\pages\admin\AdminAccountantsPage.tsx
+  35:6  warning  React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\comptabli\frontend\src\pages\admin\AdminAuditLogsPage.tsx
+  29:6  warning  React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\comptabli\frontend\src\pages\admin\AdminReviewsPage.tsx
+  29:6  warning  React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\comptabli\frontend\src\pages\admin\AdminUsersPage.tsx
+  104:6  warning  React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\comptabli\frontend\src\pages\archives\ArchivesPage.tsx
+   17:3  warning  'Filter' is defined but never used                      @typescript-eslint/no-unused-vars
+   19:3  warning  'Send' is defined but never used                        @typescript-eslint/no-unused-vars
+   66:9  warning  'isViewingClient' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  157:9  warning  'agencies' is assigned a value but never used           @typescript-eslint/no-unused-vars
+  277:9  warning  'handlePostComment' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\comptabli\frontend\src\pages\auth\Login.test.tsx
+  1:26  warning  'fireEvent' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\comptabli\frontend\src\pages\auth\Signup.tsx
+  258:16  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+C:\comptabli\frontend\src\pages\auth\Signup.tsx:258:16
+  256 |     defaultValues: { accountType: 'entreprise', email: '', phoneCode: '+216', phone: '', password: '', acceptTerms: false },
+  257 |   });
+> 258 |   const pw1  = form1.watch('password') ?? '';
+      |                ^^^^^ React Hook Form's `useForm()` API returns a `watch()` function which cannot be memoized safely.
+  259 |   const pw1c = getPasswordChecks(pw1);
+  260 |
+  261 |   const form2c = useForm<Step2CData>({  react-hooks/incompatible-library
+
+C:\comptabli\frontend\src\pages\auth\VerifyEmail.tsx
+  41:44  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-explicit-any
+  45:7   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\comptabli\frontend\src\pages\auth\VerifyEmail.tsx:45:7
+  43 |   useEffect(() => {
+  44 |     if (!token?.trim()) {
+> 45 |       setStatus('err');
+     |       ^^^^^^^^^ Avoid calling setState() directly within an effect
+  46 |       setMessage("Lien incomplet. Ouvrez le lien re├ºu par e-mail ou demandez un nouvel envoi depuis l'inscription.");
+  47 |       return;
+  48 |     }  react-hooks/set-state-in-effect
+
+C:\comptabli\frontend\src\pages\clients\ClientsPage.tsx
+    6:3   warning  'ChevronLeft' is defined but never used    @typescript-eslint/no-unused-vars
+    7:3   warning  'ChevronRight' is defined but never used   @typescript-eslint/no-unused-vars
+    8:3   warning  'ChevronsLeft' is defined but never used   @typescript-eslint/no-unused-vars
+    9:3   warning  'ChevronsRight' is defined but never used  @typescript-eslint/no-unused-vars
+   10:3   warning  'Upload' is defined but never used         @typescript-eslint/no-unused-vars
+   12:3   warning  'Calendar' is defined but never used       @typescript-eslint/no-unused-vars
+   15:3   warning  'MoreVertical' is defined but never used   @typescript-eslint/no-unused-vars
+   76:26  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  309:3   warning  'idx' is defined but never used            @typescript-eslint/no-unused-vars
+
+C:\comptabli\frontend\src\pages\collaborators\CollaboratorsPage.tsx
+  2:24  warning  'Eye' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\comptabli\frontend\src\pages\dashboard\Dashboard.test.tsx
+  16:100  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:95   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  32:106  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  40:96   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\comptabli\frontend\src\pages\demandes\DemandesPage.tsx
+   15:3   warning  'Download' is defined but never used           @typescript-eslint/no-unused-vars
+   21:3   warning  'Share2' is defined but never used             @typescript-eslint/no-unused-vars
+   43:10  warning  'getAssetUrl' is defined but never used        @typescript-eslint/no-unused-vars
+  101:61  warning  '_clientId' is defined but never used          @typescript-eslint/no-unused-vars
+  150:9   warning  'location' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\comptabli\frontend\src\pages\documents\DocumentsPage.tsx
+  55:5  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\comptabli\frontend\src\pages\documents\DocumentsPage.tsx:55:5
+  53 |
+  54 |   useEffect(() => {
+> 55 |     loadData();
+     |     ^^^^^^^^ Avoid calling setState() directly within an effect
+  56 |   }, []);
+  57 |
+  58 |   useEffect(() => {  react-hooks/set-state-in-effect
+  56:6  warning  React Hook useEffect has a missing dependency: 'loadData'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             react-hooks/exhaustive-deps
+
+C:\comptabli\frontend\src\pages\meetings\DisponibilitesPage.tsx
+   32:10  error    Error: Cannot access variable before it is declared
+
+`loadSlots` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\comptabli\frontend\src\pages\meetings\DisponibilitesPage.tsx:32:10
+  30 |
+  31 |   useEffect(() => {
+> 32 |     void loadSlots();
+     |          ^^^^^^^^^ `loadSlots` accessed before it is declared
+  33 |     void loadLeaves();
+  34 |   }, []);
+  35 |
+
+C:\comptabli\frontend\src\pages\meetings\DisponibilitesPage.tsx:36:3
+  34 |   }, []);
+  35 |
+> 36 |   const loadSlots = async () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 37 |     setLoading(true);
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 38 |     let data = await fetchAvailability();
+     ÔÇª
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 54 |     setLoading(false);
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 55 |   };
+     | ^^^^^ `loadSlots` is declared here
+  56 |
+  57 |   const loadLeaves = async () => {
+  58 |     setLeavesLoading(true);                                                                                                                react-hooks/immutability
+   33:10  error    Error: Cannot access variable before it is declared
+
+`loadLeaves` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\comptabli\frontend\src\pages\meetings\DisponibilitesPage.tsx:33:10
+  31 |   useEffect(() => {
+  32 |     void loadSlots();
+> 33 |     void loadLeaves();
+     |          ^^^^^^^^^^ `loadLeaves` accessed before it is declared
+  34 |   }, []);
+  35 |
+  36 |   const loadSlots = async () => {
+
+C:\comptabli\frontend\src\pages\meetings\DisponibilitesPage.tsx:57:3
+  55 |   };
+  56 |
+> 57 |   const loadLeaves = async () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 58 |     setLeavesLoading(true);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 59 |     const data = await fetchLeaves();
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 60 |     setLeaves(data);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 61 |     setLeavesLoading(false);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 62 |   };
+     | ^^^^^ `loadLeaves` is declared here
+  63 |
+  64 |   const handleSave = async () => {
+  65 |     setSaving(true);  react-hooks/immutability
+   66:34  warning  '_uiId' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+  113:70  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-explicit-any
+
+C:\comptabli\frontend\src\pages\meetings\MesRendezVousPage.tsx
+   11:3   warning  'Calendar' is defined but never used                                                                                          @typescript-eslint/no-unused-vars
+   15:3   warning  'Users' is defined but never used                                                                                             @typescript-eslint/no-unused-vars
+   16:3   warning  'Building2' is defined but never used                                                                                         @typescript-eslint/no-unused-vars
+   18:3   warning  'Send' is defined but never used                                                                                              @typescript-eslint/no-unused-vars
+   19:3   warning  'MoreVertical' is defined but never used                                                                                      @typescript-eslint/no-unused-vars
+   20:3   warning  'Edit2' is defined but never used                                                                                             @typescript-eslint/no-unused-vars
+   21:3   warning  'Trash2' is defined but never used                                                                                            @typescript-eslint/no-unused-vars
+   22:3   warning  'MessageCircle' is defined but never used                                                                                     @typescript-eslint/no-unused-vars
+   23:3   warning  'FileText' is defined but never used                                                                                          @typescript-eslint/no-unused-vars
+   44:10  warning  'timeLabel' is defined but never used                                                                                         @typescript-eslint/no-unused-vars
+  167:7   warning  React Hook useMemo has missing dependencies: 'todayEnd' and 'todayStart'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  172:7   warning  React Hook useMemo has a missing dependency: 'todayEnd'. Either include it or remove the dependency array                     react-hooks/exhaustive-deps
+  177:7   warning  React Hook useMemo has a missing dependency: 'todayStart'. Either include it or remove the dependency array                   react-hooks/exhaustive-deps
+  219:70  warning  'e' is defined but never used                                                                                                 @typescript-eslint/no-unused-vars
+  219:73  error    Empty block statement                                                                                                         no-empty
+  272:9   error    'finalGuests' is never reassigned. Use 'const' instead                                                                        prefer-const
+  963:30  warning  'e' is defined but never used                                                                                                 @typescript-eslint/no-unused-vars
+
+C:\comptabli\frontend\src\pages\messaging\MessagingPage.tsx
+    2:23  warning  'useLocation' is defined but never used                                                                                                                                                @typescript-eslint/no-unused-vars
+   17:10  warning  'fetchDocuments' is defined but never used                                                                                                                                             @typescript-eslint/no-unused-vars
+   17:47  warning  'AppDocument' is defined but never used                                                                                                                                                @typescript-eslint/no-unused-vars
+   18:23  warning  'CheckCircle' is defined but never used                                                                                                                                                @typescript-eslint/no-unused-vars
+   18:36  warning  'Clock' is defined but never used                                                                                                                                                      @typescript-eslint/no-unused-vars
+   82:7   warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/set-state-in-effect')
+  124:7   warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/set-state-in-effect')
+  136:7   warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/set-state-in-effect')
+  170:9   warning  The 'convoTitle' function makes the dependencies of useMemo Hook (at line 192) change on every render. To fix this, wrap the definition of 'convoTitle' in its own useCallback() Hook  react-hooks/exhaustive-deps
+
+C:\comptabli\frontend\src\pages\mon-espace\MonEspaceClient.tsx
+    28:3   warning  'archiveFolderDocuments' is defined but never used                                                             @typescript-eslint/no-unused-vars
+    47:49  warning  'OcrResultat' is defined but never used                                                                        @typescript-eslint/no-unused-vars
+   153:25  warning  Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+   215:41  warning  Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+   219:45  warning  Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+   240:70  warning  Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+   278:6   warning  React Hook useEffect has a missing dependency: 'detailFull'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+   314:11  warning  'movedDoc' is assigned a value but never used                                                                  @typescript-eslint/no-unused-vars
+   403:48  warning  Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+   407:24  warning  Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+   487:32  warning  Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+   491:36  warning  Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+  1109:43  warning  Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+
+C:\comptabli\frontend\src\pages\networking\NetworkingPage.tsx
+   48:6   warning  React Hook useEffect has a missing dependency: 'loadProfiles'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+   62:19  warning  Unexpected any. Specify a different type                                                                         @typescript-eslint/no-explicit-any
+  197:21  warning  Unexpected any. Specify a different type                                                                         @typescript-eslint/no-explicit-any
+  198:22  warning  Unexpected any. Specify a different type                                                                         @typescript-eslint/no-explicit-any
+
+C:\comptabli\frontend\src\pages\networking\NetworkingProfilePage.tsx
+   11:3   warning  'Send' is defined but never used                                                                                @typescript-eslint/no-unused-vars
+   88:6   warning  React Hook useEffect has a missing dependency: 'loadProfile'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  113:19  warning  Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+  144:19  warning  Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+
+C:\comptabli\frontend\src\pages\notifications\NotificationsPage.tsx
+  3:55  warning  'UserIcon' is defined but never used  @typescript-eslint/no-unused-vars
+  3:81  warning  'Settings' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\comptabli\frontend\src\pages\profile\ProfilePage.tsx
+   13:3   warning  'FileText' is defined but never used  @typescript-eslint/no-unused-vars
+  181:16  warning  'err' is defined but never used       @typescript-eslint/no-unused-vars
+
+C:\comptabli\frontend\src\pages\tasks\TasksPage.tsx
+   11:3   warning  'MoreHorizontal' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+   61:54  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-explicit-any
+   70:10  warning  'totalCount' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+  116:19  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-explicit-any
+  136:10  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\comptabli\frontend\src\pages\tasks\TasksPage.tsx:136:10
+  134 |   useEffect(() => { 
+  135 |     if (!token || token === 'demo-token') return;
+> 136 |     void loadTasks(1);
+      |          ^^^^^^^^^ Avoid calling setState() directly within an effect
+  137 |     void loadMetadata();
+  138 |   }, [token, showArchived]);
+  139 |                                                     react-hooks/set-state-in-effect
+  138:6   warning  React Hook useEffect has missing dependencies: 'loadMetadata' and 'loadTasks'. Either include them or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   react-hooks/exhaustive-deps
+  142:10  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\comptabli\frontend\src\pages\tasks\TasksPage.tsx:142:10
+  140 |   useEffect(() => {
+  141 |     if (!token || token === 'demo-token') return;
+> 142 |     void loadTasks(currentPage);
+      |          ^^^^^^^^^ Avoid calling setState() directly within an effect
+  143 |   }, [currentPage, token]);
+  144 |
+  145 |   useEffect(() => {                                                  react-hooks/set-state-in-effect
+  143:6   warning  React Hook useEffect has a missing dependency: 'loadTasks'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        react-hooks/exhaustive-deps
+  150:7   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\comptabli\frontend\src\pages\tasks\TasksPage.tsx:150:7
+  148 |       void fetchRequests(ticketForm.clientId).then(setClientRequests);
+  149 |     } else {
+> 150 |       setClientFolders([]);
+      |       ^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  151 |       setClientRequests([]);
+  152 |     }
+  153 |   }, [ticketForm.clientId]);                      react-hooks/set-state-in-effect
+  157:7   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\comptabli\frontend\src\pages\tasks\TasksPage.tsx:157:7
+  155 |   useEffect(() => {
+  156 |     if (selectedTask) {
+> 157 |       setLocalComments(selectedTask.comments ?? []);
+      |       ^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  158 |       setLocalAttachments(selectedTask.attachments ?? []);
+  159 |     }
+  160 |     if (selectedTask?.clientId) {  react-hooks/set-state-in-effect
+  176:36  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-explicit-any
+  291:11  warning  'isCollab' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+  292:11  warning  'isAssignee' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+
+C:\comptabli\frontend\src\store\notificationStore.ts
+  87:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\comptabli\frontend\vite.config.ts
+  18:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  26:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Ô£û 133 problems (13 errors, 120 warnings)
+  1 error and 3 warnings potentially fixable with the `--fix` option.
+
+node.exe : npm error 
+Lifecycle script `lint` 
+failed with error:
+Au caractère C:\Program 
+Files\nodejs\npm.ps1:29 : 
+3
++   & $NODE_EXE 
+$NPM_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (n  
+  pm error Lifec...led    
+ with error::String) [    
+], RemoteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+npm error code 1
+npm error path 
+C:\comptabli\frontend
+npm error workspace 
+frontend@0.0.0
+npm error location 
+C:\comptabli\frontend
+npm error command failed
+npm error command C:\WINDO
+WS\system32\cmd.exe /d /s 
+/c eslint .

@@ -14,14 +14,13 @@ import {
   Check,
   X,
   Building2,
-  Filter,
   ListRestart,
-  Send,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import {
   fetchFolders,
   setFolderArchived,
+  deleteFolder,
   type Folder,
 } from '../../lib/api/folderService';
 import {
@@ -63,8 +62,6 @@ export default function ArchivesPage() {
   const { clientId: urlClientId } = useParams<{ clientId?: string }>();
   const { user, token } = useAuthStore();
   const targetClientId = urlClientId || undefined;
-  const isViewingClient = !!urlClientId;
-
   const [allDocs, setAllDocs] = useState<AppDocument[]>([]);
   const [archivedFolders, setArchivedFolders] = useState<Folder[]>([]);
   const [loading, setLoading] = useState(true);
@@ -83,7 +80,6 @@ export default function ArchivesPage() {
   const [targetDoc, setTargetDoc] = useState<AppDocument | null>(null);
   const [deleteFolderOpen, setDeleteFolderOpen] = useState(false);
   const [targetFolder, setTargetFolder] = useState<Folder | null>(null);
-  const [exchangeInput, setExchangeInput] = useState('');
   const menuRef = useRef<HTMLDivElement>(null);
   const AVATAR_COLORS = ['#6366f1', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
@@ -154,16 +150,6 @@ export default function ArchivesPage() {
     return list;
   }, [allDocs, docSearch, docTypeFilter, agencyFilter]);
 
-  const agencies = useMemo(() => {
-    const m = new Map<string, number>();
-    allDocs.forEach((d) => {
-      const label = d.folder?.name ?? 'Sans dossier';
-      m.set(label, (m.get(label) ?? 0) + 1);
-    });
-    return [...m.entries()]
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => a.name.localeCompare(b.name));
-  }, [allDocs]);
 
   useEffect(() => {
     if (!drawerDoc || !token || token === 'demo-token') {
@@ -272,16 +258,6 @@ export default function ArchivesPage() {
     setTargetFolder(null);
     await load();
     showToast('ok', 'Dossier supprimé définitivement.');
-  };
-
-  const handlePostComment = async () => {
-    if (!drawerDoc || !exchangeInput.trim()) return;
-    const res = await addDocumentComment(drawerDoc.id, exchangeInput.trim());
-    if (res.ok) {
-      setExchangeInput('');
-      const updated = await fetchDocumentById(drawerDoc.id);
-      if (updated) setDrawerDetail(updated);
-    }
   };
 
   if (user?.role && !['CLIENT', 'COMPTABLE', 'COLLABORATEUR', 'ADMIN'].includes(user.role)) {

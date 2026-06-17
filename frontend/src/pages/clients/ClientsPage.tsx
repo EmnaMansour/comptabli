@@ -3,16 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Search, 
   Plus, 
-  ChevronLeft, 
-  ChevronRight, 
-  ChevronsLeft, 
-  ChevronsRight,
-  Upload,
   X,
-  Calendar,
   Pencil,
   Trash2,
-  MoreVertical,
   Check
 } from 'lucide-react';
 import { 
@@ -153,7 +146,7 @@ export default function ClientsPage() {
       {/* Toast */}
       {toast && (
         <div className={`ws-toast ws-toast--${toast.kind === 'ok' ? 'success' : 'error'}`} style={{ 
-          position: 'fixed', bottom: '2rem', right: '2rem', zTarget: 1000,
+          position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 1000,
           background: toast.kind === 'ok' ? '#10b981' : '#ef4444', color: '#fff',
           padding: '0.75rem 1.5rem', borderRadius: '12px', fontWeight: 600,
           display: 'flex', alignItems: 'center', gap: '0.75rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'
@@ -306,7 +299,7 @@ export default function ClientsPage() {
 
 function ClientCard({ 
   client, 
-  idx,
+  idx: _idx,
   onEdit,
   onDelete
 }: { 

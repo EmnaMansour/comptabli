@@ -8,7 +8,7 @@ import {
   X,
   Send,
   Calendar,
-  MoreHorizontal,
+  MoreHorizontal as _MoreHorizontal,
   Trash2,
   Flag,
   FileText,
@@ -67,7 +67,6 @@ export default function TasksPage({ hideHeader, filterByAssigneeId }: TasksPageP
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage] = useState(10);
-  const [totalCount, setTotalCount] = useState(0);
   const [taskError, setTaskError] = useState<string | null>(null);
 
   const [ticketForm, setTicketForm] = useState({
@@ -108,7 +107,6 @@ export default function TasksPage({ hideHeader, filterByAssigneeId }: TasksPageP
       const current = res.page || 1;
       setTasks(res.data || []);
       setTotalPages(lastPage);
-      setTotalCount(res.total);
       setCurrentPage(current > lastPage ? lastPage : current);
       if (!res.data || res.data.length === 0) {
         setTaskError(res.total === 0 ? 'Aucune tâche trouvée pour cette page.' : null);
@@ -116,7 +114,6 @@ export default function TasksPage({ hideHeader, filterByAssigneeId }: TasksPageP
     } catch (err: any) {
       setTasks([]);
       setTotalPages(1);
-      setTotalCount(0);
       setTaskError(err?.message || 'Erreur lors du chargement des tâches.');
     }
   };
@@ -133,12 +130,14 @@ export default function TasksPage({ hideHeader, filterByAssigneeId }: TasksPageP
 
   useEffect(() => { 
     if (!token || token === 'demo-token') return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void loadTasks(1);
     void loadMetadata();
   }, [token, showArchived]);
 
   useEffect(() => {
     if (!token || token === 'demo-token') return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void loadTasks(currentPage);
   }, [currentPage, token]);
 
@@ -147,6 +146,7 @@ export default function TasksPage({ hideHeader, filterByAssigneeId }: TasksPageP
       void fetchFolders({ clientId: ticketForm.clientId }).then(setClientFolders);
       void fetchRequests(ticketForm.clientId).then(setClientRequests);
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setClientFolders([]);
       setClientRequests([]);
     }
@@ -154,6 +154,7 @@ export default function TasksPage({ hideHeader, filterByAssigneeId }: TasksPageP
 
   useEffect(() => {
     if (selectedTask) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLocalComments(selectedTask.comments ?? []);
       setLocalAttachments(selectedTask.attachments ?? []);
     }
@@ -288,8 +289,6 @@ export default function TasksPage({ hideHeader, filterByAssigneeId }: TasksPageP
 
   // ─── RENDER ──────────────────────────────────────────────────────────────
   if (selectedTask) {
-    const isCollab = me?.role === 'COLLABORATEUR';
-    const isAssignee = selectedTask.assignees?.some(a => a.id === me?.id);
 
     return (
       <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100vh', margin: '-1.5rem', background: '#f8fafc' }}>
@@ -1025,39 +1024,7 @@ export default function TasksPage({ hideHeader, filterByAssigneeId }: TasksPageP
           </div>
         </div>
       )}
-      {/* ── Rejection Modal ─────────────────────────────────────── */}
-      {isRejectionModalOpen && selectedTask && (
-        <div className="ws-modal-overlay" onClick={() => setIsRejectionModalOpen(false)} style={{ zIndex: 9999 }}>
-          <div className="ws-modal animate-fade-in" onClick={e => e.stopPropagation()} style={{ maxWidth: 480, borderRadius: 16 }}>
-            <div style={{ marginBottom: 24 }}>
-               <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>Motif du rejet</h2>
-               <p style={{ fontSize: '0.9rem', color: '#64748b' }}>Expliquez pourquoi cette tâche n'est pas validée pour aider le collaborateur.</p>
-            </div>
-            <textarea 
-               className="ws-input w-full" 
-               rows={4} 
-               placeholder="Saisissez vos retours ici..." 
-               value={rejectionReason} 
-               onChange={e => setRejectionReason(e.target.value)}
-               autoFocus
-            />
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 24 }}>
-               <button className="ws-btn-secondary" onClick={() => setIsRejectionModalOpen(false)}>Annuler</button>
-               <button 
-                  className="ws-btn-primary" 
-                  style={{ background: '#dc2626' }}
-                  onClick={() => {
-                    void handleStatusChange(selectedTask.id, 'REJECTED', rejectionReason);
-                    setIsRejectionModalOpen(false);
-                    setRejectionReason('');
-                  }}
-               >
-                  Rejeter la tâche
-               </button>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }

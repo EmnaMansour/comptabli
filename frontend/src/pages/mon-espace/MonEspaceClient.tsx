@@ -25,7 +25,6 @@ import {
   createFolder,
   updateFolder,
   setFolderArchived,
-  archiveFolderDocuments,
   deleteFolder,
   type Folder,
 } from '../../lib/api/folderService';
@@ -44,7 +43,7 @@ import {
 import { fetchClientById } from '../../lib/api/clientService';
 import { useHiddenDocumentIds } from '../../hooks/useLocalDocumentState';
 import { createInvoice } from '../../lib/api/invoiceService';
-import { lancerExtraction, pollerResultat, type OcrResultat } from '../../lib/api/ocrService';
+import { lancerExtraction, pollerResultat } from '../../lib/api/ocrService';
 import { getAssetUrl } from '../../lib/api';
 import EntityMenu, { type EntityAction } from '../../components/common/EntityMenu';
 import '../../styles/workspace-ui.css';
@@ -311,7 +310,6 @@ export default function MonEspaceClient() {
     if (!docId || !token || token === 'demo-token') return;
 
     // Optimistic update: remove from current document list
-    const movedDoc = documents.find(d => d.id === docId);
     setDocuments(prev => prev.filter(d => d.id !== docId));
     
     // Optimistic update: increment folder count
@@ -519,7 +517,7 @@ export default function MonEspaceClient() {
         if (extractedItems.length > 0) {
           setInvoiceItems(extractedItems);
         } else {
-          const htVal = parseFloat(result.total_ht || '0') || 0;
+          const htVal = parseFloat(getValue(result.total_ht) || '0') || 0;
           if (htVal > 0) {
             setInvoiceItems([{ description: 'Article extrait', quantity: '1', rate: formatAmount(result.total_ht), amount: formatAmount(result.total_ht) }]);
           } else {

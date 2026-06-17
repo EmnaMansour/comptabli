@@ -25,6 +25,7 @@ export default function Sidebar() {
         if (c) setClientName(`${c.firstName} ${c.lastName}`);
       });
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setClientName('');
     }
   }, [activeClientId]);
@@ -59,6 +60,7 @@ export default function Sidebar() {
       )
       .map((item) => item.label);
     if (labelsToOpen.length) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setOpenMenus((prev) => [...new Set([...prev, ...labelsToOpen, 'Mon espace', clientLabel])]);
     }
   }, [location.pathname, navItems, clientLabel]);

@@ -8,7 +8,6 @@ import {
   Calendar,
   MessageCircle,
   Star,
-  Send,
   Loader,
   Lock,
   CheckCircle,
@@ -581,7 +580,7 @@ export default function NetworkingProfilePage() {
       <ContactAccountantModal
         open={contactOpen}
         onClose={() => setContactOpen(false)}
-        accountantName={profile?.firstName ? `${profile.firstName} ${profile.lastName}` : 'le comptable'}
+        accountantName={profile?.accountant?.firstName ? `${profile.accountant.firstName} ${profile.accountant.lastName}` : displayName}
         accountantId={id || ''}
         defaultSubject={contactDefaultSubject}
       />
@@ -589,7 +588,7 @@ export default function NetworkingProfilePage() {
       <ScheduleMeetingModal
         open={scheduleOpen}
         onClose={() => setScheduleOpen(false)}
-        accountantName={profile?.firstName ? `${profile.firstName} ${profile.lastName}` : 'le comptable'}
+        accountantName={profile?.accountant?.firstName ? `${profile.accountant.firstName} ${profile.accountant.lastName}` : displayName}
         accountantId={id || ''}
       />
     </div>

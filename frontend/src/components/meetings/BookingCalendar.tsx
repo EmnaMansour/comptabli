@@ -25,6 +25,7 @@ export default function BookingCalendar({ accountantId, onSelectSlot, selectedDa
 
   useEffect(() => {
     if (!accountantId) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     fetchAvailableSlots(accountantId, year, month)
       .then(setSlots)

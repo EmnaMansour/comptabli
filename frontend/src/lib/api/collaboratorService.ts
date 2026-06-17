@@ -49,7 +49,7 @@ export async function createCollaborator(
 }
 export async function updateCollaborator(
   id: string,
-  data: Partial<CollaboratorData>
+  data: Partial<CollaboratorData> & { password?: string }
 ): Promise<{ ok: boolean; message?: string }> {
   const response = await authFetch(`/users/collaborators/${id}`, {
     method: 'PATCH',

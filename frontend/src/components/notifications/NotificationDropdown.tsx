@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Bell, Check, Maximize2, User as UserIcon, FileText, Calendar, CheckSquare, X, Mail, Briefcase } from 'lucide-react';
+import { Bell, Check, User as UserIcon, FileText, Calendar, CheckSquare, X, Briefcase } from 'lucide-react';
 import { useNotificationStore, type NotificationType } from '../../store/notificationStore';
 import './notification-dropdown.css';
 
@@ -29,9 +29,8 @@ function formatRelativeTime(iso: string) {
 export default function NotificationDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<NotificationType | null>(null);
-  const [clientDetails, setClientDetails] = useState<{ email?: string; phone?: string; companyName?: string } | null>(null);
-  const [loadingDetails, setLoadingDetails] = useState(false);
   
+
   const { notifications, markAsRead, markAllAsRead } = useNotificationStore();
   
   // Exclude MESSAGE notifications from the generic Bell dropdown
@@ -51,22 +50,6 @@ export default function NotificationDropdown() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const fetchClientDetails = async (clientId: string) => {
-    try {
-      setLoadingDetails(true);
-      const { authFetch } = await import('../../lib/authFetch');
-      const response = await authFetch(`/users/${clientId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setClientDetails(data);
-      }
-    } catch (err) {
-      console.error("Erreur lors du chargement des détails du client", err);
-    } finally {
-      setLoadingDetails(false);
-    }
-  };
-
   const onRowClick = async (n: NotificationType) => {
     if (!n.read) {
       await markAsRead(n.id);
@@ -76,10 +59,6 @@ export default function NotificationDropdown() {
     // Navigation logic
     if (n.type === 'CONTACT_RECEIVED') {
       setSelectedContact(n);
-      setClientDetails(null);
-      if (n.linkedId) {
-        fetchClientDetails(n.linkedId);
-      }
       return;
     }
 

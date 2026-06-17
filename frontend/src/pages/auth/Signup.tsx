@@ -510,7 +510,7 @@ const Signup: React.FC = () => {
       )}
 
       <div className="auth-root">
-        <div className="auth-card">
+        <div className="auth-card auth-card--signup">
           {/* Left */}
           <AuthLeftPanel />
 
@@ -536,98 +536,125 @@ const Signup: React.FC = () => {
                 <form onSubmit={handleStep1} noValidate className={`auth-form ${stepClass}`}>
                   {renderTypeToggle()}
 
-                  <div className="auth-field">
-                    <label htmlFor="signup-email" className="auth-label">Adresse e-mail professionnelle</label>
-                    <input
-                      id="signup-email"
-                      {...form1.register('email')}
-                      type="email"
-                      placeholder="ex john@domain.com"
-                      style={inp(!!form1.formState.errors.email)}
-                    />
-                    {form1.formState.errors.email && (
-                      <span className="auth-error-text">{form1.formState.errors.email.message}</span>
-                    )}
-                  </div>
-
-                  <div className="auth-field">
-                    <p className="auth-label">Numéro de téléphone</p>
-                    <div className="auth-phone-wrap">
-                      <select {...form1.register('phoneCode')} style={{ ...inp(), width: 86, flexShrink: 0 }}>
-                        <option>+216</option>
-                      </select>
-                      <input
-                        {...form1.register('phone')}
-                        type="tel"
-                        placeholder="Entrer votre numéro de téléphone"
-                        style={{ ...inp(!!form1.formState.errors.phone), flex: 1 }}
-                      />
-                    </div>
-                    {form1.formState.errors.phone && (
-                      <span className="auth-error-text">{form1.formState.errors.phone.message}</span>
-                    )}
-                  </div>
-
-                  {/* Password only for entreprise on step 1 */}
-                  {accountType === 'entreprise' && (
+                  {accountType === 'comptable' ? (
                     <>
                       <div className="auth-field">
-                        <label htmlFor="signup-password-entreprise" className="auth-label">Mot de passe</label>
-                        <PwInput
-                          {...form1.register('password')}
-                          inputId="signup-password-entreprise"
-                          show={showPw}
-                          onToggle={() => setShowPw((p) => !p)}
-                          placeholder="Entrer votre mot de passe"
-                          error={!!form1.formState.errors.password}
+                        <label htmlFor="signup-email" className="auth-label">Adresse e-mail professionnelle</label>
+                        <input
+                          id="signup-email"
+                          {...form1.register('email')}
+                          type="email"
+                          placeholder="ex john@domain.com"
+                          style={inp(!!form1.formState.errors.email)}
                         />
-                        {form1.formState.errors.password && (
-                          <span className="auth-error-text">{form1.formState.errors.password.message}</span>
+                        {form1.formState.errors.email && (
+                          <span className="auth-error-text">{form1.formState.errors.email.message}</span>
                         )}
                       </div>
-                      <PasswordChecksGrid checks={pw1c} />
-                      {/* <div className="auth-check-row">
-                        <input
-                          id="signup-terms-entreprise"
-                          {...form1.register('acceptTerms')}
-                          type="checkbox"
-                          style={{ width: 15, height: 15, accentColor: 'var(--f-blue-600)' }}
-                        />
-                        <label htmlFor="signup-terms-entreprise">J'accepte les termes et conditions</label>
-                      </div>
-                      {form1.formState.errors.acceptTerms && (
-                        <span className="auth-error-text" style={{ display: 'block', marginTop: 6, marginBottom: 12 }}>
-                          {form1.formState.errors.acceptTerms.message}
-                        </span>
-                      )} */}
 
-                      {/* CAPTCHA */}
-                      <div className="auth-captcha-box">
-                        <label className="auth-captcha-label">
+                      <div className="auth-field">
+                        <p className="auth-label">Numéro de téléphone</p>
+                        <div className="auth-phone-wrap">
+                          <select {...form1.register('phoneCode')} style={{ ...inp(), width: 86, flexShrink: 0 }}>
+                            <option>+216</option>
+                          </select>
                           <input
-                            {...form1.register('notRobot')}
-                            type="checkbox"
-                            className="auth-captcha-checkbox"
+                            {...form1.register('phone')}
+                            type="tel"
+                            placeholder="Entrer votre numéro de téléphone"
+                            style={{ ...inp(!!form1.formState.errors.phone), flex: 1 }}
                           />
-                          <span className="auth-captcha-check-visual">
-                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                              <polyline points="2,7 6,11 12,3" stroke="#2563eb" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                            </svg>
-                          </span>
-                          <span>Je ne suis pas un robot</span>
-                        </label>
-                        <div className="auth-captcha-badge">
-                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#4285f4"/>
-                          </svg>
-                          <div style={{ fontSize: '0.6rem', color: '#9ca3af', lineHeight: 1.2, textAlign: 'center' }}>reCAPTCHA<br/>Privacy - Terms</div>
+                        </div>
+                        {form1.formState.errors.phone && (
+                          <span className="auth-error-text">{form1.formState.errors.phone.message}</span>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* ENTREPRISE: Ultra compact layout to prevent scrolling */}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px', marginBottom: '12px' }}>
+                        <div className="auth-field" style={{ marginBottom: 0 }}>
+                          <label htmlFor="signup-email" className="auth-label">Adresse e-mail professionnelle</label>
+                          <input
+                            id="signup-email"
+                            {...form1.register('email')}
+                            type="email"
+                            placeholder="ex john@domain.com"
+                            style={inp(!!form1.formState.errors.email)}
+                          />
+                          {form1.formState.errors.email && (
+                            <span className="auth-error-text">{form1.formState.errors.email.message}</span>
+                          )}
+                        </div>
+
+                        <div className="auth-field" style={{ marginBottom: 0 }}>
+                          <p className="auth-label">Numéro de téléphone</p>
+                          <div className="auth-phone-wrap">
+                            <select {...form1.register('phoneCode')} style={{ ...inp(), width: 80, flexShrink: 0, paddingRight: 4 }}>
+                              <option>+216</option>
+                            </select>
+                            <input
+                              {...form1.register('phone')}
+                              type="tel"
+                              placeholder="Entrer votre numéro"
+                              style={{ ...inp(!!form1.formState.errors.phone), flex: 1 }}
+                            />
+                          </div>
+                          {form1.formState.errors.phone && (
+                            <span className="auth-error-text">{form1.formState.errors.phone.message}</span>
+                          )}
                         </div>
                       </div>
-                      {form1.formState.errors.notRobot && (
-                        <span className="auth-error-text" style={{ display: 'block', marginTop: 4 }}>
-                          {form1.formState.errors.notRobot.message}
-                        </span>
-                      )}
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px', alignItems: 'start' }}>
+                        <div>
+                          <div className="auth-field" style={{ marginBottom: '8px' }}>
+                            <label htmlFor="signup-password-entreprise" className="auth-label">Mot de passe</label>
+                            <PwInput
+                              {...form1.register('password')}
+                              inputId="signup-password-entreprise"
+                              show={showPw}
+                              onToggle={() => setShowPw((p) => !p)}
+                              placeholder="Entrer votre mot de passe"
+                              error={!!form1.formState.errors.password}
+                            />
+                            {form1.formState.errors.password && (
+                              <span className="auth-error-text">{form1.formState.errors.password.message}</span>
+                            )}
+                          </div>
+                          <PasswordChecksGrid checks={pw1c} />
+                        </div>
+                        
+                        <div>
+                          <p className="auth-label">Vérification</p>
+                          <div className="auth-captcha-box" style={{ marginBottom: 0, padding: '8px 12px', height: '42px' }}>
+                            <label className="auth-captcha-label" style={{ fontSize: '0.8rem' }}>
+                              <input
+                                {...form1.register('notRobot')}
+                                type="checkbox"
+                                className="auth-captcha-checkbox"
+                              />
+                              <span className="auth-captcha-check-visual" style={{ width: 22, height: 22 }}>
+                                <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+                                  <polyline points="2,7 6,11 12,3" stroke="#2563eb" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                                </svg>
+                              </span>
+                              <span>Je ne suis pas un robot</span>
+                            </label>
+                            <div className="auth-captcha-badge">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#4285f4"/>
+                              </svg>
+                            </div>
+                          </div>
+                          {form1.formState.errors.notRobot && (
+                            <span className="auth-error-text" style={{ display: 'block', marginTop: 4 }}>
+                              {form1.formState.errors.notRobot.message}
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </>
                   )}
 
