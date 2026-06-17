@@ -23,7 +23,6 @@ import MesRendezVousPage from './pages/meetings/MesRendezVousPage';
 import SearchComptables from './pages/search/SearchComptables';
 import SettingsPage from './pages/settings/SettingsPage';
 import ArchivesPage from './pages/archives/ArchivesPage';
-import BanquesPage from './pages/banques/BanquesPage';
 import NotificationsPage from './pages/notifications/NotificationsPage';
 import NetworkingPage from './pages/networking/NetworkingPage';
 import NetworkingProfilePage from './pages/networking/NetworkingProfilePage';
@@ -84,7 +83,6 @@ export default function App() {
           <Route path="/meetings" element={<MesRendezVousPage />} />
           <Route path="/search" element={<SearchComptables />} />
           <Route path="/archives" element={<ArchivesPage />} />
-          <Route path="/banques" element={<BanquesPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboardPage /></AdminRoute>} />

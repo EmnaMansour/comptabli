@@ -11,7 +11,6 @@ import { TasksModule } from './tasks/tasks.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { FoldersModule } from './folders/folders.module';
-import { BanksModule } from './banks/banks.module';
 import { RequestsModule } from './requests/requests.module';
 import { MeetingsModule } from './meetings/meetings.module';
 import { MessagingModule } from './messaging/messaging.module';
@@ -46,7 +45,6 @@ import { PrometheusModule } from '@willsoto/nestjs-prometheus';
     DocumentsModule,
     TasksModule,
     FoldersModule,
-    BanksModule,
     RequestsModule,
     MeetingsModule,
     MessagingModule,

@@ -3,7 +3,6 @@ import {
   Archive,
   Calendar,
   ClipboardList,
-  CreditCard,
   FolderOpen,
   LayoutDashboard,
   ListTodo,
@@ -32,7 +31,6 @@ export function getDashboardNav(role: UserRole | null): NavItemConfig[] {
       { key: 'archives', label: 'Archives', icon: Archive, path: '/archives' },
       { key: 'demandes', label: 'Mes demandes', icon: ClipboardList, path: '/demandes' },
       { key: 'rdv', label: 'Mes Rendez-vous', icon: Calendar, path: '/meetings' },
-      // { key: 'banques', label: 'Mes banques', icon: CreditCard, path: '/banques' },
       { key: 'msg', label: 'Messagerie', icon: MessageCircle, path: '/messaging' },
       { key: 'networking', label: 'Réseautage', icon: Users, path: '/networking' },
     ];

@@ -44,7 +44,6 @@ model User {
   accountantCollaborators    AccountantCollaborator[]  @relation("AccountantCollaborators")
   collaboratorAccountants    AccountantCollaborator[]  @relation("CollaboratorAccountants")
   auditLogs                  AuditLog[]
-  bankAccounts               BankAccount[]
   conversationParticipants   ConversationParticipant[]
   uploadedDocuments          Document[]                @relation("DocumentUploader")
   ownedDocuments             Document[]                @relation("DocumentOwner")
@@ -701,55 +700,6 @@ model StorageQuota {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@index([organizationId])
-}
-
-model BankAccount {
-  id           String            @id @default(cuid())
-  bankName     String
-  agency       String?
-  rib          String?
-  accountType  String?
-  pack         String?
-  login        String?
-  password     String?
-  balance      Float             @default(0)
-  currency     String            @default("EUR")
-  userId       String
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  transactions BankTransaction[]
-  statements   BankStatement[]
-
-  @@index([userId])
-}
-
-model BankTransaction {
-  id            String      @id @default(cuid())
-  date          DateTime    @default(now())
-  operation     String
-  details       String?
-  reference     String?
-  amount        Float
-  currency      String      @default("EUR")
-  bankAccountId String
-  createdAt     DateTime    @default(now())
-  bankAccount   BankAccount @relation(fields: [bankAccountId], references: [id], onDelete: Cascade)
-
-  @@index([bankAccountId])
-  @@index([date])
-}
-
-model BankStatement {
-  id            String      @id @default(cuid())
-  name          String
-  url           String?
-  date          DateTime    @default(now())
-  bankAccountId String
-  bankAccount   BankAccount @relation(fields: [bankAccountId], references: [id], onDelete: Cascade)
-  createdAt     DateTime    @default(now())
-
-  @@index([bankAccountId])
 }
 
 enum Role {
