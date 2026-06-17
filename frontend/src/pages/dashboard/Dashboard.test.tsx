@@ -17,7 +17,10 @@ describe('Dashboard', () => {
     await act(async () => {
       wrap(<Dashboard />);
     });
-    expect(await screen.findByText(/tableau de bord/i)).toBeInTheDocument();
+    // On cible le titre h1 de la page (unique) → pas d'ambiguïté
+    expect(
+      await screen.findByRole('heading', { level: 1, name: /tableau de bord/i })
+    ).toBeInTheDocument();
   });
 
   it('renders CLIENT dashboard', async () => {
@@ -25,7 +28,9 @@ describe('Dashboard', () => {
     await act(async () => {
       wrap(<Dashboard />);
     });
-    expect(await screen.findByText(/tableau de bord client/i)).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: /tableau de bord client/i })
+    ).toBeInTheDocument();
   });
 
   it('renders COLLABORATEUR dashboard', async () => {
@@ -33,7 +38,9 @@ describe('Dashboard', () => {
     await act(async () => {
       wrap(<Dashboard />);
     });
-    expect(await screen.findByText(/tableau de bord collaborateur/i)).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: /tableau de bord collaborateur/i })
+    ).toBeInTheDocument();
   });
 
   it('redirects ADMIN without crash', async () => {
