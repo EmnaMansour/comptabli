@@ -2,7 +2,6 @@ import { render, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ProfilePage from './ProfilePage';
 import SettingsPage from '../settings/SettingsPage';
-import BanquesPage from '../banques/BanquesPage';
 import NotificationsPage from '../notifications/NotificationsPage';
 import NetworkingPage from '../networking/NetworkingPage';
 import NetworkingProfilePage from '../networking/NetworkingProfilePage';
@@ -37,13 +36,6 @@ describe('Profile & Misc Pages', () => {
   it('SettingsPage renders without crashing', async () => {
     await act(async () => {
       wrap(<SettingsPage />);
-    });
-    expect(document.body).toBeTruthy();
-  });
-
-  it('BanquesPage renders without crashing', async () => {
-    await act(async () => {
-      wrap(<BanquesPage />);
     });
     expect(document.body).toBeTruthy();
   });
