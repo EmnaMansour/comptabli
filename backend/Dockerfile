@@ -52,5 +52,5 @@ USER nestuser
 
 EXPOSE 3000
 
-# Lancer les migrations puis l'application
-CMD ["sh", "-c", "npx prisma migrate deploy && npm run start:prod"]
+# Synchroniser le schéma puis lancer l'application
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && npm run start:prod"]
