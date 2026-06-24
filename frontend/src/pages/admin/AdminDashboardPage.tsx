@@ -208,7 +208,7 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          <div className="dashboard-grid equal" style={{ marginBottom: '2.5rem' }}>
+          <div style={{ marginBottom: '2.5rem' }}>
             <div className="dashboard-card" style={{ borderRadius: 24, padding: '1.25rem' }}>
               <div className="dashboard-card-header" style={{ border: 'none', padding: '0.5rem 0.5rem 1.5rem' }}>
                 <span className="dashboard-card-title" style={{ fontSize: '1.15rem', fontWeight: 800 }}>Signalements & Support</span>
@@ -221,6 +221,7 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
+            {/*
             <div className="dashboard-card" style={{ borderRadius: 24, padding: '1.25rem' }}>
               <div className="dashboard-card-header" style={{ border: 'none', padding: '0.5rem 0.5rem 1.5rem' }}>
                 <span className="dashboard-card-title" style={{ fontSize: '1.15rem', fontWeight: 800 }}>Journal d'audit récent</span>
@@ -259,6 +260,7 @@ export default function AdminDashboardPage() {
                 )}
               </div>
             </div>
+            */}
           </div>
         </>
       ) : null}

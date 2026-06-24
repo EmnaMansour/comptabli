@@ -39,27 +39,34 @@ const step1Schema = z
     email: z.string().trim().refine((value) => emailPattern.test(value), 'Email invalide'),
     phoneCode: z.string(),
     phone: z.string().min(8, 'Numéro invalide'),
-    password: z
-      .string()
-      .optional()
-      .refine((v) => !v || v.length >= 8, '8 caractères minimum'),
+    password: z.string().optional(),
     acceptTerms: z.boolean().optional(),
     notRobot: z.boolean().optional(),
   })
   .superRefine((data, ctx) => {
-    if (data.accountType === 'entreprise' && !data.password?.trim()) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Mot de passe requis',
-        path: ['password'],
-      });
-    }
-    if (data.accountType === 'entreprise' && !data.notRobot) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Veuillez confirmer que vous n\'\u00eates pas un robot',
-        path: ['notRobot'],
-      });
+    if (data.accountType === 'entreprise') {
+      const pw = data.password || '';
+      if (!pw.trim()) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Mot de passe requis',
+          path: ['password'],
+        });
+      } else {
+        if (pw.length < 8) ctx.addIssue({ code: 'custom', message: '8 caractères minimum', path: ['password'] });
+        if (!/[a-z]/.test(pw)) ctx.addIssue({ code: 'custom', message: 'Une minuscule', path: ['password'] });
+        if (!/[A-Z]/.test(pw)) ctx.addIssue({ code: 'custom', message: 'Une majuscule', path: ['password'] });
+        if (!/\d/.test(pw)) ctx.addIssue({ code: 'custom', message: 'Un chiffre', path: ['password'] });
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(pw)) ctx.addIssue({ code: 'custom', message: 'Un caractère spécial', path: ['password'] });
+      }
+      
+      if (!data.notRobot) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Veuillez confirmer que vous n\'\u00eates pas un robot',
+          path: ['notRobot'],
+        });
+      }
     }
   });
 

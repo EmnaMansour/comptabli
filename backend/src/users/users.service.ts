@@ -456,7 +456,7 @@ export class UsersService {
   }
 
   async updateOwnAdminProfile(id: string, data: any) {
-    const allowed = ['email', 'firstName', 'lastName'];
+    const allowed = ['email', 'firstName', 'lastName', 'profileImageUrl', 'coverImageUrl'];
     const clean: any = {};
     for (const field of allowed) {
       if (data[field] !== undefined) clean[field] = data[field];

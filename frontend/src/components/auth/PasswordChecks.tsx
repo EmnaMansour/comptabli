@@ -23,6 +23,7 @@ interface PasswordChecksProps {
 
 const PasswordChecksGrid: React.FC<PasswordChecksProps> = ({ checks }) => (
   <div className="auth-pw-checks">
+    <CheckItem ok={checks.length}    label="8 caractères minimum" />
     <CheckItem ok={checks.lowercase} label="One lowercase character" />
     <CheckItem ok={checks.number}    label="One number" />
     <CheckItem ok={checks.uppercase} label="One uppercase character" />

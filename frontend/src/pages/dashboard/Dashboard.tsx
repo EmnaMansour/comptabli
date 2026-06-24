@@ -592,7 +592,6 @@ function DashboardClient({ stats }: { stats: DashboardStats | null }) {
 }
 
 function DashboardCollaborateur({ stats }: { stats: DashboardStats | null }) {
-  const hasPendingReqs = (stats?.pendingRequests ?? 0) > 0;
   const hasPendingTasks = (stats?.pendingTasks ?? 0) > 0;
 
   return (
@@ -659,47 +658,12 @@ function DashboardCollaborateur({ stats }: { stats: DashboardStats | null }) {
       {/* Quick Actions */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 14, marginBottom: 28 }}>
         <QuickCard to="/tasks" title="Task management" desc="Kanban et suivi des tâches" icon={ListTodo} />
-        <QuickCard to="/demandes" title="Mes demandes" desc="Demandes qui vous sont assignées" icon={ClipboardList} />
         <QuickCard to="/messaging" title="Messagerie" desc="Échanger avec votre équipe" icon={MessageCircle} />
       </div>
 
       {/* Summary cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
-        {/* Demandes */}
-        <div className="dashboard-card">
-          <div className="dashboard-card-header">
-            <span className="dashboard-card-title">Demandes assignées</span>
-            <Link to="/demandes" style={{ fontSize: '0.85rem', color: 'var(--primary-color)', fontWeight: 500, textDecoration: 'none' }}>Voir toutes →</Link>
-          </div>
-          <div className="dashboard-card-body">
-            {hasPendingReqs ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                <div style={{
-                  width: 56, height: 56, borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #eff6ff, #dbeafe)',
-                  color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <ClipboardList size={26} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1 }}>
-                    {stats?.pendingRequests}
-                  </div>
-                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: 4 }}>
-                    demande{(stats?.pendingRequests ?? 0) > 1 ? 's' : ''} en attente de traitement
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: 'var(--text-muted)' }}>
-                <CheckSquare size={20} style={{ color: '#22c55e' }} />
-                <span>Aucune demande en attente — tout est à jour ✓</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Tâches */}
+{/* Tâches */}
         <div className="dashboard-card">
           <div className="dashboard-card-header">
             <span className="dashboard-card-title">Tâches en cours</span>

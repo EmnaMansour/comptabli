@@ -39,6 +39,8 @@ model User {
   patenteUrl                 String?
   rneUrl                     String?
   website                    String?
+  profileImageUrl            String?
+  coverImageUrl              String?
   accountantClients          AccountantClient[]        @relation("AccountantClients")
   clientAccountants          AccountantClient[]        @relation("ClientAccountants")
   accountantCollaborators    AccountantCollaborator[]  @relation("AccountantCollaborators")

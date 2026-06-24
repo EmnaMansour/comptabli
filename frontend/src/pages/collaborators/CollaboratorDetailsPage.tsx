@@ -158,7 +158,7 @@ export default function CollaboratorDetailsPage() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '2rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: activeTab === 'tasks' ? '1fr' : '1fr 340px', gap: '2rem' }}>
          <div style={{ background: 'white', borderRadius: 16, border: '1px solid var(--border-color)', padding: '2rem' }}>
             {activeTab === 'info' && (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>

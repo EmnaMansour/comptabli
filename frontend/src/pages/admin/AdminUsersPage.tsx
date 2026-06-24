@@ -20,7 +20,6 @@ import {
   type AdminStatus,
   type AdminUser,
   updateAdminUser,
-  updateAdminUserRole,
   updateAdminUserStatus,
 } from '../../lib/api/adminService';
 
@@ -212,16 +211,7 @@ export default function AdminUsersPage() {
     }
   };
 
-  const changeRole = async (item: AdminUser, next: AdminRole) => {
-    try {
-      await updateAdminUserRole(item.id, next);
-      showToast('ok', `Role mis a jour: ${next}`);
-      await load();
-      if (selected?.id === item.id) await viewUser(item.id);
-    } catch (err) {
-      showToast('err', err instanceof Error ? err.message : 'Changement de role impossible');
-    }
-  };
+
 
   // const resetPassword = async (item: AdminUser) => {
   //   if (!window.confirm(`Reinitialiser le mot de passe de ${item.email} ?`)) return;
@@ -379,14 +369,19 @@ export default function AdminUsersPage() {
                 <div style={{ padding: '0.75rem', background: '#f8fafc', borderRadius: 12, marginBottom: '1.25rem' }}>
                    <div style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', color: '#94a3b8', marginBottom: 6, letterSpacing: '0.05em' }}>Rôle & Attribution</div>
                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <select 
-                        className="ws-select" 
-                        style={{ padding: '4px 8px', fontSize: '0.85rem', height: 'auto', background: 'white' }}
-                        value={item.role} 
-                        onChange={(e) => void changeRole(item, e.target.value as AdminRole)}
+                      <div 
+                        style={{ 
+                          padding: '4px 10px', 
+                          fontSize: '0.85rem', 
+                          fontWeight: 700,
+                          background: 'white',
+                          border: '1px solid #e2e8f0',
+                          borderRadius: '8px',
+                          color: '#334155'
+                        }}
                       >
-                        {allRoles.map(r => <option key={r} value={r}>{r}</option>)}
-                      </select>
+                        {item.role}
+                      </div>
                       
                       {item.role === 'CLIENT' && item.clientAccountants?.[0]?.accountant ? (
                         <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#3b82f6' }}>

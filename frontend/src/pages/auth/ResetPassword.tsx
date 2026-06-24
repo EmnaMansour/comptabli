@@ -9,7 +9,9 @@ import { Eye, EyeOff, CheckCircle, XCircle } from 'lucide-react';
 
 import AuthLeftPanel from '../../components/auth/AuthLeftPanel';
 import AppLogo from '../../components/branding/AppLogo';
+import PasswordChecksGrid from '../../components/auth/PasswordChecks';
 import { resetPasswordRequest } from '../../lib/api';
+import { getPasswordChecks } from '../../types/auth.types';
 import '../../styles/auth.css';
 
 const primaryBtnSx = {
@@ -43,9 +45,12 @@ export default function ResetPassword() {
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
+  const checks = getPasswordChecks(password);
+  const isValidPw = Object.values(checks).every(Boolean);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 8 || password !== confirm || !token) return;
+    if (!isValidPw || password !== confirm || !token) return;
     setLoading(true);
     try {
       const res = await resetPasswordRequest(token.trim(), password);
@@ -187,6 +192,8 @@ export default function ResetPassword() {
                     </div>
                   </div>
 
+                  <PasswordChecksGrid checks={checks} />
+
                   <div className="auth-field">
                     <label className="auth-label">Confirmer le mot de passe *</label>
                     <div className="auth-input-password-wrap">
@@ -217,7 +224,7 @@ export default function ResetPassword() {
                     fullWidth
                     variant="contained"
                     disableElevation
-                    disabled={loading || password.length < 8 || mismatch}
+                    disabled={loading || !isValidPw || mismatch}
                     sx={primaryBtnSx}
                   >
                     {loading ? (

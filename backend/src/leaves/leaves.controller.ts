@@ -35,9 +35,9 @@ export class LeavesController {
   }
 
   @Get()
-  @Roles(Role.COMPTABLE)
+  @Roles(Role.COMPTABLE, Role.CLIENT, Role.COLLABORATEUR, Role.ADMIN)
   findAll(@Request() req: any) {
-    return this.leavesService.findAllByAccountant(req.user.userId);
+    return this.leavesService.findAllForUser(req.user.userId, req.user.role);
   }
 
   @Delete(':id')

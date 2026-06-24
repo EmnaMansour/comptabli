@@ -113,9 +113,7 @@ export default function MesRendezVousPage() {
     setLoading(true);
     try { 
       setMeetings(await fetchMeetings()); 
-      if (role === 'COMPTABLE') {
-        setLeaves(await fetchLeaves());
-      }
+      setLeaves(await fetchLeaves());
     } finally { setLoading(false); }
   }, [token, role]);
 

@@ -91,6 +91,8 @@ export default function ProfilePage() {
             rcNumber: '',
             location: '',
             mapsLink: '',
+            profileImageUrl: profile.profileImageUrl || '',
+            coverImageUrl: profile.coverImageUrl || '',
           }));
         })
         .catch((err: Error) => setToast(err.message));
@@ -136,6 +138,8 @@ export default function ProfilePage() {
           firstName: identity.firstName,
           lastName: identity.lastName,
           email: identity.email,
+          profileImageUrl: identity.profileImageUrl,
+          coverImageUrl: identity.coverImageUrl,
         });
         if (passwords.currentPassword && passwords.newPassword) {
           await changeAdminPassword(passwords);

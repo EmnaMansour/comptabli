@@ -69,41 +69,7 @@ export class StatsService {
 
     let pieData = Object.entries(typeCount).map(([name, value]) => ({ name, value }));
 
-    // ✨ DEMO MOCK FOR EMPTY ACCOUNTS (for PFE presentations)
-    if (docCount === 0 && pendingRequests === 0) {
-      expenseData = [
-        { name: monthNames[(currentMonth - 8 + 12) % 12], value: 1200 },
-        { name: monthNames[(currentMonth - 7 + 12) % 12], value: 1800 },
-        { name: monthNames[(currentMonth - 6 + 12) % 12], value: 1500 },
-        { name: monthNames[(currentMonth - 5 + 12) % 12], value: 2400 },
-        { name: monthNames[(currentMonth - 4 + 12) % 12], value: 1900 },
-        { name: monthNames[(currentMonth - 3 + 12) % 12], value: 2100 },
-        { name: monthNames[(currentMonth - 2 + 12) % 12], value: 2800 },
-        { name: monthNames[(currentMonth - 1 + 12) % 12], value: 2600 },
-        { name: monthNames[currentMonth], value: 3100 },
-      ];
-      pieData = [
-        { name: 'Factures', value: 45 },
-        { name: 'Contrats', value: 15 },
-        { name: 'Relevés', value: 25 },
-        { name: 'Autres', value: 15 }
-      ];
-      return {
-        documents: 24,
-        folders: 5,
-        invoices: { count: 12, totalAmount: 4520.50 },
-        pendingRequests: 3,
-        nextMeeting: { title: 'Bilan Trimestriel', scheduledAt: new Date(Date.now() + 86400000) },
-        revenueData: expenseData,
-        pieData,
-        recentActivity: [
-          { name: 'Facture_Avril_2026.pdf', type: 'Uploadé', date: new Date().toISOString() },
-          { name: 'Contrat de prestation', type: 'Signature demandée', date: new Date(Date.now() - 86400000).toISOString() },
-          { name: 'Bilan 2025.pdf', type: 'Validé', date: new Date(Date.now() - 172800000).toISOString() },
-          { name: 'Relevé bancaire', type: 'Téléchargé', date: new Date(Date.now() - 272800000).toISOString() }
-        ]
-      };
-    }
+    // ✨ DEMO MOCK FOR EMPTY ACCOUNTS removed by request so new users see empty dashboards.
 
     return {
       documents: docCount,

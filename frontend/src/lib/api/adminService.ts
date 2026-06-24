@@ -139,6 +139,8 @@ export type AdminProfile = {
   firstName: string;
   lastName: string;
   status: AdminStatus;
+  profileImageUrl?: string | null;
+  coverImageUrl?: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -348,6 +350,8 @@ export async function updateAdminProfile(payload: {
   firstName?: string;
   lastName?: string;
   email?: string;
+  profileImageUrl?: string;
+  coverImageUrl?: string;
 }) {
   const response = await authFetch('/admin/profile', {
     method: 'PATCH',
