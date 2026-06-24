@@ -251,6 +251,8 @@ jobs:
           GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
       - name: Verify deployment
         run: |
+          echo "=== Synchronisation de la Base de Données ==="
+          docker exec backend npx prisma db push --force-reset
           echo "=== Conteneurs en cours d'exécution ==="
           docker ps
           echo "=== Déploiement réussi ! ==="
