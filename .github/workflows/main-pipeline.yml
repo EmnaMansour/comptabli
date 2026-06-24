@@ -231,6 +231,16 @@ jobs:
       - name: Stop existing containers
         run: docker compose -f docker-compose.prod.yml down --remove-orphans
         continue-on-error: true
+      - name: Sync Database Schema
+        run: |
+          docker compose -f docker-compose.prod.yml up -d postgres
+          docker compose -f docker-compose.prod.yml run --rm backend npx prisma db push --force-reset
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
       - name: Start all services
         run: docker compose -f docker-compose.prod.yml up -d
         env:
@@ -251,8 +261,6 @@ jobs:
           GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
       - name: Verify deployment
         run: |
-          echo "=== Synchronisation de la Base de Données ==="
-          docker exec backend npx prisma db push --force-reset
           echo "=== Conteneurs en cours d'exécution ==="
           docker ps
           echo "=== Déploiement réussi ! ==="
