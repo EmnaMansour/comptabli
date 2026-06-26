@@ -122,8 +122,11 @@ export class StatsService {
       }),
       this.prisma.task.findMany({
         where: { 
-          assignees: { some: { id: userId } },
-          status: { notIn: [Status.DONE, Status.INACTIVE, Status.REJECTED] }
+          OR: [
+            { assignees: { some: { id: userId } } },
+            { createdBy: userId }
+          ],
+          status: { notIn: [Status.DONE, Status.INACTIVE, Status.REJECTED, Status.VALIDATED] }
         },
         orderBy: { deadline: 'asc' },
         take: 5,
@@ -260,7 +263,7 @@ export class StatsService {
       this.prisma.user.count({ where: { role: Role.COMPTABLE } }),
       this.prisma.user.count({ where: { role: Role.CLIENT } }),
       this.prisma.user.count({ where: { role: Role.COLLABORATEUR } }),
-      this.prisma.organization.aggregate({ _sum: { storageUsed: true } }),
+      this.prisma.document.aggregate({ _sum: { size: true } }),
       this.prisma.user.count({
         where: {
           createdAt: { gte: new Date(new Date().setHours(0, 0, 0, 0)) },
@@ -301,7 +304,7 @@ export class StatsService {
         totalUsers,
         newUsersToday,
         disabledUsers,
-        storageUsed: totalStorage._sum.storageUsed || 0,
+        storageUsed: totalStorage._sum.size || 0,
         storageLimit: 100 * 1024 * 1024 * 1024,
         alerts: pendingComptables + pendingReviews + pendingRequests,
       },
