@@ -1165,7 +1165,6 @@ export default function MonEspaceClient() {
                         ) : (
                           <div style={{ display: 'flex', gap: 10 }}>
                              <button type="button" className="ws-btn-outline" onClick={() => openEditDoc(drawerDoc)}>Modifier</button>
-                             <button type="button" className="ws-btn-primary" onClick={() => openShare(drawerDoc)}>Partager</button>
                           </div>
                         )}
                       </div>

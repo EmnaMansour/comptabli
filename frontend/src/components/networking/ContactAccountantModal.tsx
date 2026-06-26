@@ -63,6 +63,25 @@ export default function ContactAccountantModal({
 
   const handleNext = () => {
     if (step === 1 && (!fullName || !email || !phone || !company)) return;
+
+    const normalizedEmail = email.trim().toLowerCase();
+    
+    /* 
+    // Bloquer .co comme s'il manquait le "m" de .com (UX / remarque du jury)
+    if (normalizedEmail.endsWith('.co')) {
+      setError("L'adresse e-mail semble incomplète ou incorrecte. S'il manque un 'm' pour '.com', veuillez le corriger.");
+      return;
+    }
+
+    // Validation standard
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
+    if (!emailRegex.test(normalizedEmail)) {
+      setError("Veuillez saisir une adresse e-mail valide.");
+      return;
+    }
+    */
+
+    setError('');
     setStep(step + 1);
   };
 
