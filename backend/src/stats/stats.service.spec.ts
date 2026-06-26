@@ -7,6 +7,7 @@ const mockPrisma = {
   document: {
     count: jest.fn(),
     findMany: jest.fn(),
+    aggregate: jest.fn(),
   },
   folder: { count: jest.fn() },
   invoice: {
@@ -130,7 +131,7 @@ describe('StatsService', () => {
         .mockResolvedValueOnce(15)  // totalCollabs
         .mockResolvedValueOnce(5);  // newUsersToday
 
-      mockPrisma.organization.aggregate.mockResolvedValue({ _sum: { storageUsed: 512 } });
+      mockPrisma.document.aggregate.mockResolvedValue({ _sum: { size: 512 } });
       mockPrisma.review.count.mockResolvedValue(5);
       mockPrisma.request.count.mockResolvedValue(3);
       mockPrisma.auditLog.findMany.mockResolvedValue([]);
