@@ -14,6 +14,11 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { RolesGuard } from '../common/guards/roles.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { Express } from 'express';
+import { UploadedFile, UseInterceptors } from '@nestjs/common';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role, Status } from '@prisma/client';
 import { AuthGuard } from '@nestjs/passport';
@@ -61,6 +66,32 @@ export class UsersController {
   @Get('me')
   getProfile(@Request() req: RequestWithUser) {
     return this.usersService.findById(req.user.userId);
+  }
+
+  @Patch('me')
+  updateMyProfile(@Request() req: RequestWithUser, @Body() data: any) {
+    return this.usersService.update(req.user.userId, data);
+  }
+
+  @Post('me/upload')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (_req, file, callback) => {
+          const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
+          const timestamp = Date.now();
+          const ext = extname(file.originalname);
+          const baseName = safeName.replace(new RegExp(`\\${ext}$`), '');
+          callback(null, `${timestamp}-${baseName}${ext}`);
+        },
+      }),
+      limits: { fileSize: 10 * 1024 * 1024 },
+    }),
+  )
+  async uploadMyProfileFile(@UploadedFile() file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('Aucun fichier fourni');
+    return { url: `/uploads/${file.filename}` };
   }
 
   @Get('messaging-directory')

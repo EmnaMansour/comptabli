@@ -22,8 +22,9 @@ import {
 import {
   fetchMyAccountantProfile,
   updateMyAccountantProfile,
-  uploadAccountantFile,
 } from '../../lib/api/accountantProfileService';
+import { authFetch } from '../../lib/authFetch';
+import { getAssetUrl, apiErrorMessage } from '../../lib/api';
 
 export default function ProfilePage() {
   const { user } = useAuthStore();
@@ -167,6 +168,37 @@ export default function ProfilePage() {
           profileImageUrl: identity.profileImageUrl,
         });
         setToast('Votre profil a été mis à jour avec succès');
+      } else {
+        // Fallback for Clients / Collaborators
+        const res = await authFetch('/users/me', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firstName: identity.firstName,
+            lastName: identity.lastName,
+            companyName: identity.companyName,
+            legalType: identity.legalType,
+            activitySector: identity.activitySector,
+            headquarters: identity.headquarters,
+            rcNumber: identity.rcNumber,
+            phone: identity.phone,
+            whatsapp: identity.whatsapp,
+            location: identity.location,
+            mapsLink: identity.mapsLink,
+            website: identity.website,
+            patenteUrl: identity.patenteUrl,
+            rneUrl: identity.rneUrl,
+            coverImageUrl: identity.coverImageUrl,
+            profileImageUrl: identity.profileImageUrl,
+          }),
+        });
+        if (!res.ok) throw new Error(await apiErrorMessage(res, 'Mise à jour impossible'));
+        
+        // Also update the store if needed
+        const updatedData = await res.json();
+        useAuthStore.setState({ user: { ...useAuthStore.getState().user!, ...updatedData } });
+        
+        setToast('Votre profil a été mis à jour avec succès');
       }
       setEditing(false);
     } catch (err) {
@@ -178,7 +210,16 @@ export default function ProfilePage() {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
       try {
-        const url = await uploadAccountantFile(file);
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await authFetch('/users/me/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        const url = getAssetUrl(data.url);
+        
         setIdentity((prev) => ({ ...prev, [field]: url }));
         setToast(`${file.name} téléchargé avec succès`);
       } catch (err) {

@@ -411,7 +411,8 @@ export class UsersService {
       'email', 'firstName', 'lastName', 'companyName', 'phone', 
       'birthDate', 'cinUrl', 'diplomaUrl', 'experienceLevel', 'hireDate',
       'activitySector', 'headquarters', 'legalType', 'location', 'mapsLink',
-      'rcNumber', 'whatsapp', 'status', 'role'
+      'rcNumber', 'whatsapp', 'status', 'role',
+      'patenteUrl', 'rneUrl', 'website', 'profileImageUrl', 'coverImageUrl'
     ];
     
     const clean: any = {};
