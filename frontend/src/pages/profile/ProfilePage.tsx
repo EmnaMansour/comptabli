@@ -206,21 +206,32 @@ export default function ProfilePage() {
     const isImage = url.match(/\.(jpeg|jpg|gif|png)$/i) != null;
 
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ background: '#e0e7ff', color: '#4f46e5', padding: '8px', borderRadius: '8px', fontSize: '0.7rem', fontWeight: 'bold' }}>
-            {isImage ? 'JPG' : 'DOC'}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ background: '#e0e7ff', color: '#4f46e5', padding: '8px', borderRadius: '8px', fontSize: '0.7rem', fontWeight: 'bold' }}>
+              {isImage ? 'JPG' : 'DOC'}
+            </div>
+            <div>
+              <p style={{ fontSize: '0.9rem', color: '#0f172a', fontWeight: 500 }}>{fileName}</p>
+              <a href={url} target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: '#2563eb', textDecoration: 'none' }}>Voir le fichier</a>
+            </div>
           </div>
-          <div>
-            <p style={{ fontSize: '0.9rem', color: '#0f172a', fontWeight: 500 }}>{fileName}</p>
-            <a href={url} target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: '#2563eb', textDecoration: 'none' }}>Voir le fichier</a>
-          </div>
+          {editing && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button
+                type="button"
+                onClick={() => field === 'patenteUrl' ? patenteInputRef.current?.click() : rneInputRef.current?.click()}
+                style={{ background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', borderRadius: '6px', padding: '4px 12px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: 600 }}
+              >
+                Remplacer
+              </button>
+              <button type="button" onClick={() => setIdentity({ ...identity, [field]: '' })} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}>
+                <Trash2 size={18} />
+              </button>
+            </div>
+          )}
         </div>
-        {editing && (
-          <button type="button" onClick={() => setIdentity({ ...identity, [field]: '' })} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}>
-            <Trash2 size={18} />
-          </button>
-        )}
       </div>
     );
   };
