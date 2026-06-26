@@ -366,6 +366,22 @@ const Signup: React.FC = () => {
       const data1 = form1.getValues();
       const data2 = form2c.getValues();
       const emailNorm = data1.email.trim().toLowerCase();
+
+      // Upload des fichiers vers le serveur public
+      const uploadFile = async (file: File): Promise<string> => {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await fetch(apiUrl('/auth/upload'), { method: 'POST', body: formData });
+        if (!res.ok) throw new Error('Échec de l\'upload du fichier ' + file.name);
+        const data = await res.json() as { url: string };
+        return data.url;
+      };
+
+      const [patenteUrlUploaded, rneUrlUploaded] = await Promise.all([
+        patenteFile ? uploadFile(patenteFile) : Promise.resolve(''),
+        rneFile ? uploadFile(rneFile) : Promise.resolve(''),
+      ]);
+
       const response = await fetch(apiUrl('/auth/register/comptable'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -377,8 +393,8 @@ const Signup: React.FC = () => {
           companyName: data2.cabinetName.trim() || 'Cabinet',
           phone: data1.phone,
           activitySector: data2.sector,
-          patenteUrl: patenteFile?.name, // Simulating file URLs for demo
-          rneUrl: rneFile?.name,
+          patenteUrl: patenteUrlUploaded,
+          rneUrl: rneUrlUploaded,
         }),
       });
       if (!response.ok) {

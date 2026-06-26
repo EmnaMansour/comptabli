@@ -1,4 +1,8 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { Express } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
@@ -51,5 +55,25 @@ export class AuthController {
   async checkEmail(@Body() body: { email: string }) {
     const user = await this.authService.checkEmail(body.email);
     return { available: !user };
+  }
+  @Post('upload')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (_req, file, callback) => {
+          const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
+          const timestamp = Date.now();
+          const ext = extname(file.originalname);
+          const baseName = safeName.replace(new RegExp(`\\${ext}$`), '');
+          callback(null, `${timestamp}-${baseName}${ext}`);
+        },
+      }),
+      limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB max
+    }),
+  )
+  async uploadPublic(@UploadedFile() file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('Aucun fichier fourni');
+    return { url: `/uploads/${file.filename}` };
   }
 }
