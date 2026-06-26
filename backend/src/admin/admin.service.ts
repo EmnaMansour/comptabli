@@ -42,7 +42,7 @@ export class AdminService {
     private readonly auditLogService: AuditLogService,
     private readonly mailService: MailService,
     private readonly usersService: UsersService,
-  ) {}
+  ) { }
 
   private async logAction(
     actor: AdminActor,

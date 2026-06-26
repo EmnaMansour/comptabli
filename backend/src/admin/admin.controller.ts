@@ -30,7 +30,7 @@ type AdminRequest = Request & {
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Roles(Role.ADMIN)
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(private readonly adminService: AdminService) { }
 
   private actor(req: AdminRequest) {
     return {
