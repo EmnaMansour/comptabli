@@ -373,6 +373,7 @@ export class AdminService {
       email?: string;
       phone?: string;
       companyName?: string;
+      accountantId?: string;
     },
   ) {
     const user = await this.prisma.user.findUnique({ where: { id } });

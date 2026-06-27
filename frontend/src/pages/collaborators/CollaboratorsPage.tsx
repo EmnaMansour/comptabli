@@ -277,7 +277,24 @@ export default function CollaboratorsPage() {
                      <div>
                         <label className="ws-input-label">CIN</label>
                         <div className="ws-dropzone" onClick={() => document.getElementById('cin-upload')?.click()} style={{ padding: '1rem', height: '100px' }}>
-                          <input id="cin-upload" type="file" style={{display: 'none'}} onChange={e => setNewCollab({...newCollab, cinFile: e.target.files?.[0] || null})} />
+                          <input 
+                            id="cin-upload" 
+                            type="file" 
+                            accept=".pdf,.png,.jpg,.jpeg,.jfif"
+                            style={{display: 'none'}} 
+                            onChange={e => {
+                               const file = e.target.files?.[0] || null;
+                               if (file) {
+                                  const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+                                  if (!['pdf', 'png', 'jpg', 'jpeg', 'jfif'].includes(ext)) {
+                                     showToast('err', `Le type de fichier .${ext} n'est pas autorisé pour la CIN.`);
+                                     e.target.value = '';
+                                     return;
+                                  }
+                               }
+                               setNewCollab({...newCollab, cinFile: file});
+                            }} 
+                          />
                           <FileText size={20} color="var(--text-muted)" style={{ marginBottom: 4 }} />
                           <p style={{ fontSize: '0.75rem', fontWeight: 600 }}>Glissez-déposez ou cliquez</p>
                           {newCollab.cinFile && <p style={{ fontSize: '0.7rem', color: '#2563eb' }}>{newCollab.cinFile.name}</p>}
@@ -286,7 +303,24 @@ export default function CollaboratorsPage() {
                      <div>
                         <label className="ws-input-label">Diplôme</label>
                         <div className="ws-dropzone" onClick={() => document.getElementById('dip-upload')?.click()} style={{ padding: '1rem', height: '100px' }}>
-                          <input id="dip-upload" type="file" style={{display: 'none'}} onChange={e => setNewCollab({...newCollab, diplomaFile: e.target.files?.[0] || null})} />
+                          <input 
+                            id="dip-upload" 
+                            type="file" 
+                            accept=".pdf,.png,.jpg,.jpeg,.jfif"
+                            style={{display: 'none'}} 
+                            onChange={e => {
+                               const file = e.target.files?.[0] || null;
+                               if (file) {
+                                  const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+                                  if (!['pdf', 'png', 'jpg', 'jpeg', 'jfif'].includes(ext)) {
+                                     showToast('err', `Le type de fichier .${ext} n'est pas autorisé pour le diplôme.`);
+                                     e.target.value = '';
+                                     return;
+                                  }
+                               }
+                               setNewCollab({...newCollab, diplomaFile: file});
+                            }} 
+                          />
                           <FileText size={20} color="var(--text-muted)" style={{ marginBottom: 4 }} />
                           <p style={{ fontSize: '0.75rem', fontWeight: 600 }}>Glissez-déposez ou cliquez</p>
                           {newCollab.diplomaFile && <p style={{ fontSize: '0.7rem', color: '#2563eb' }}>{newCollab.diplomaFile.name}</p>}

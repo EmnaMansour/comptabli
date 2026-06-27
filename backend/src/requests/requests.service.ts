@@ -395,11 +395,19 @@ export class RequestsService {
       data.accountantId = userId;
     }
 
-    return this.prisma.request.update({
+    const updated = await this.prisma.request.update({
       where: { id },
       data,
       include: requestIncludeFull,
     });
+
+    if (status === Status.INACTIVE) {
+      await this.prisma.task.deleteMany({
+        where: { requestId: id },
+      });
+    }
+
+    return updated;
   }
 
   async addComment(id: string, userId: string, role: Role, content: string) {

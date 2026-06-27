@@ -209,6 +209,12 @@ export default function ProfilePage() {
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: keyof typeof identity) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
+      const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+      if (!['pdf', 'png', 'jpg', 'jpeg', 'jfif'].includes(ext)) {
+         setToast(`Le type de fichier .${ext} n'est pas autorisé. Seuls PDF et images.`);
+         e.target.value = '';
+         return;
+      }
       try {
         const formData = new FormData();
         formData.append('file', file);
@@ -385,13 +391,13 @@ export default function ProfilePage() {
               <div style={{ gridColumn: '1 / -1' }}>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: 8 }}>Patente</label>
                 {renderFilePreview(identity.patenteUrl, 'patenteUrl', 'Patente')}
-                <input type="file" ref={patenteInputRef} style={{ display: 'none' }} onChange={(e) => handleFileUpload(e, 'patenteUrl')} />
+                <input type="file" ref={patenteInputRef} style={{ display: 'none' }} accept=".pdf,.png,.jpg,.jpeg,.jfif" onChange={(e) => handleFileUpload(e, 'patenteUrl')} />
               </div>
 
               <div style={{ gridColumn: '1 / -1' }}>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: 8 }}>RNE</label>
                 {renderFilePreview(identity.rneUrl, 'rneUrl', 'RNE')}
-                <input type="file" ref={rneInputRef} style={{ display: 'none' }} onChange={(e) => handleFileUpload(e, 'rneUrl')} />
+                <input type="file" ref={rneInputRef} style={{ display: 'none' }} accept=".pdf,.png,.jpg,.jpeg,.jfif" onChange={(e) => handleFileUpload(e, 'rneUrl')} />
               </div>
 
               <div>

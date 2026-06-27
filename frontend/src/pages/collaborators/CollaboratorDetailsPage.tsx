@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Edit, Power, Phone, Mail, X, LogOut } from 'lucide-react';
+import { ArrowLeft, Edit, Power, Phone, Mail, X, LogOut, Check } from 'lucide-react';
 import { fetchCollaboratorsStats, updateCollaborator, deleteCollaborator, type CollaboratorData } from '../../lib/api/collaboratorService';
 import { useAuthStore } from '../../store/authStore';
+import { authFetch } from '../../lib/authFetch';
 import TasksPage from '../tasks/TasksPage';
 
 import '../../styles/workspace-ui.css';
@@ -21,6 +22,13 @@ export default function CollaboratorDetailsPage() {
   
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  
+  const [toast, setToast] = useState<{ kind: 'ok' | 'err'; text: string } | null>(null);
+  
+  const showToast = (kind: 'ok' | 'err', text: string) => {
+    setToast({ kind, text });
+    setTimeout(() => setToast(null), 4500);
+  };
 
   const loadData = async () => {
     const list = await fetchCollaboratorsStats();
@@ -45,7 +53,34 @@ export default function CollaboratorDetailsPage() {
       setDeactivateModal(false);
       navigate('/collaborators');
     } else {
-      alert(res.message);
+      showToast('err', res.message || 'Erreur');
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'cinUrl' | 'diplomaUrl') => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+      if (!['pdf', 'png', 'jpg', 'jpeg', 'jfif'].includes(ext)) {
+         showToast('err', `Le type de fichier .${ext} n'est pas autorisé. Seuls PDF et images sont acceptés.`);
+         e.target.value = '';
+         return;
+      }
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await authFetch('/users/me/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        
+        setEditForm((prev) => ({ ...prev, [field]: data.url }));
+        showToast('ok', `${file.name} téléchargé avec succès`);
+      } catch (err) {
+        showToast('err', 'Échec du téléchargement du fichier');
+      }
     }
   };
 
@@ -58,17 +93,17 @@ export default function CollaboratorDetailsPage() {
       else {
          setNewPassword('');
          setConfirmPassword('');
-         alert('Mot de passe mis à jour avec succès !');
+         showToast('ok', 'Mot de passe mis à jour avec succès !');
       }
       loadData();
     } else {
-      alert(res.message);
+      showToast('err', res.message || 'Erreur');
     }
   };
 
   const handleUpdatePassword = () => {
-    if (newPassword.length < 8) return alert('Le mot de passe doit faire au moins 8 caractères.');
-    if (newPassword !== confirmPassword) return alert('Les mots de passe ne correspondent pas.');
+    if (newPassword.length < 8) return showToast('err', 'Le mot de passe doit faire au moins 8 caractères.');
+    if (newPassword !== confirmPassword) return showToast('err', 'Les mots de passe ne correspondent pas.');
     handleSaveInfo(newPassword);
   };
 
@@ -77,6 +112,17 @@ export default function CollaboratorDetailsPage() {
 
   return (
     <>
+      {toast && (
+        <div className={`ws-toast ws-toast--${toast.kind === 'ok' ? 'success' : 'error'}`} style={{ zIndex: 10001 }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {toast.kind === 'ok' ? <Check size={18} /> : <X size={18} />}
+            {toast.text}
+          </span>
+          <button type="button" onClick={() => setToast(null)} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }}>
+            <X size={16} />
+          </button>
+        </div>
+      )}
       <div style={{ padding: '0 0 2rem 0', maxWidth: 1400, margin: '0 auto', width: '100%' }}>
       
       {/* Header */}
@@ -169,18 +215,42 @@ export default function CollaboratorDetailsPage() {
                  <div><label className="ws-input-label">Date de naissance</label><input className="ws-input" type="date" value={isEditing ? (editForm.birthDate?.split('T')[0] || '') : (collab.birthDate?.split('T')[0] || '')} onChange={e => setEditForm({...editForm, birthDate: e.target.value})} readOnly={!isEditing} /></div>
                  <div>
                    <label className="ws-input-label">CIN / Pièce d'identité</label>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', border: '1px solid #e2e8f0', borderRadius: 8, background: '#f8fafc' }}>
-                     <div style={{ background: '#3b82f6', color: 'white', borderRadius: 4, padding: '4px 6px', fontSize: '0.7rem' }}>PDF</div>
-                     <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{collab.cinUrl || 'cin_document.pdf'}</div>
-                   </div>
+                   {isEditing ? (
+                     <>
+                       <input 
+                         className="ws-input" 
+                         type="file" 
+                         accept=".pdf,.png,.jpg,.jpeg,.jfif"
+                         onChange={(e) => handleFileUpload(e, 'cinUrl')}
+                       />
+                       {editForm.cinUrl && <div style={{fontSize: '0.75rem', color: '#10b981', marginTop: 4, fontWeight: 600}}>Nouveau fichier téléchargé avec succès.</div>}
+                     </>
+                   ) : (
+                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', border: '1px solid #e2e8f0', borderRadius: 8, background: '#f8fafc' }}>
+                       <div style={{ background: '#3b82f6', color: 'white', borderRadius: 4, padding: '4px 6px', fontSize: '0.7rem' }}>PDF</div>
+                       <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{collab.cinUrl || 'cin_document.pdf'}</div>
+                     </div>
+                   )}
                  </div>
                  <div><label className="ws-input-label">Niveau d'expérience</label><input className="ws-input" value={isEditing ? (editForm.experienceLevel || '') : (collab.experienceLevel || '')} onChange={e => setEditForm({...editForm, experienceLevel: e.target.value})} readOnly={!isEditing} /></div>
                  <div>
                    <label className="ws-input-label">Diplôme / Certificat</label>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', border: '1px solid #e2e8f0', borderRadius: 8, background: '#f8fafc' }}>
-                     <div style={{ background: '#3b82f6', color: 'white', borderRadius: 4, padding: '4px 6px', fontSize: '0.7rem' }}>PDF</div>
-                     <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{collab.diplomaUrl || 'diploma_cert.pdf'}</div>
-                   </div>
+                   {isEditing ? (
+                     <>
+                       <input 
+                         className="ws-input" 
+                         type="file" 
+                         accept=".pdf,.png,.jpg,.jpeg,.jfif"
+                         onChange={(e) => handleFileUpload(e, 'diplomaUrl')}
+                       />
+                       {editForm.diplomaUrl && <div style={{fontSize: '0.75rem', color: '#10b981', marginTop: 4, fontWeight: 600}}>Nouveau fichier téléchargé avec succès.</div>}
+                     </>
+                   ) : (
+                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', border: '1px solid #e2e8f0', borderRadius: 8, background: '#f8fafc' }}>
+                       <div style={{ background: '#3b82f6', color: 'white', borderRadius: 4, padding: '4px 6px', fontSize: '0.7rem' }}>PDF</div>
+                       <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{collab.diplomaUrl || 'diploma_cert.pdf'}</div>
+                     </div>
+                   )}
                  </div>
               </div>
             )}

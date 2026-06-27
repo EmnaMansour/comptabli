@@ -202,15 +202,11 @@ export default function MonEspaceClient() {
       }
       
       if (drawerDoc.category === 'Facturation') {
-        if (drawerDoc.status === 'VALIDATED') {
-           setExtractState('synced');
-        } else if (drawerDoc.extractedData) {
+        if (drawerDoc.extractedData) {
            try {
               const data = JSON.parse(drawerDoc.extractedData);
-              if (data.statut === 'EN_COURS') {
-                 setExtractState('extracting');
-              } else if (data.statut === 'TERMINE') {
-                 setExtractState('form');
+              if (drawerDoc.status === 'VALIDATED' || data.statut === 'TERMINE') {
+                 setExtractState(drawerDoc.status === 'VALIDATED' ? 'synced' : 'form');
                  const getValue = (val: any) => {
                    if (val && typeof val === 'object' && 'value' in val) return val.value;
                    return val;
@@ -252,10 +248,11 @@ export default function MonEspaceClient() {
                      setInvoiceItems([]);
                    }
                  }
+              } else if (data.statut === 'EN_COURS') {
+                 setExtractState('extracting');
               } else if (data.statut === 'ERREUR') {
                  setExtractState('idle');
-                 // Ne montrer le toast d'erreur que si on vient d'ouvrir le tiroir,
-                 // pour éviter de spammer le toast à chaque rerender.
+                 // Ne montrer le toast d'erreur que si on vient d'ouvrir le tiroir
                  if (!detailFull) {
                     showToast('err', data.message || "Erreur lors de l'extraction automatique");
                  }
@@ -1438,7 +1435,7 @@ export default function MonEspaceClient() {
             <div className="ws-modal-header">
               <div>
                 <h2>Importer un document</h2>
-                <p>Ajoutez un fichier à votre espace (JPEG, PNG, PDF, MP4 — max 50 Mo).</p>
+                <p>Ajoutez un fichier à votre espace (JPEG, PNG, JPG, JFIF, PDF — max 50 Mo).</p>
               </div>
               <button type="button" className="ws-icon-btn" onClick={() => setIsUploadModalOpen(false)}>
                 <X size={20} />
@@ -1463,6 +1460,11 @@ export default function MonEspaceClient() {
                     e.preventDefault();
                     const f = e.dataTransfer.files[0];
                     if (f) {
+                      const ext = f.name.split('.').pop()?.toLowerCase() ?? '';
+                      if (!['pdf', 'png', 'jpg', 'jpeg', 'jfif'].includes(ext)) {
+                        showToast('err', `Le type de fichier .${ext} n'est pas autorisé. Seuls les PDF et images sont acceptés.`);
+                        return;
+                      }
                       setSelectedFile(f);
                       if (!customName) setCustomName(f.name.replace(/\.[^/.]+$/, ""));
                     }
@@ -1471,9 +1473,18 @@ export default function MonEspaceClient() {
                   <input
                     id="ws-file"
                     type="file"
+                    accept=".pdf,.png,.jpg,.jpeg,.jfif"
                     style={{ display: 'none' }}
                     onChange={(e) => {
                       const f = e.target.files?.[0] ?? null;
+                      if (f) {
+                        const ext = f.name.split('.').pop()?.toLowerCase() ?? '';
+                        if (!['pdf', 'png', 'jpg', 'jpeg', 'jfif'].includes(ext)) {
+                          showToast('err', `Le type de fichier .${ext} n'est pas autorisé. Seuls les PDF et images sont acceptés.`);
+                          e.target.value = '';
+                          return;
+                        }
+                      }
                       setSelectedFile(f);
                       if (f && !customName) setCustomName(f.name.replace(/\.[^/.]+$/, ""));
                     }}
@@ -1487,7 +1498,7 @@ export default function MonEspaceClient() {
                     Glissez-déposez vos documents
                   </h3>
                   <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1.5rem' }}>
-                    JPEG, PNG, PDF et MP4, jusqu'à 50 Mo
+                    JPEG, PNG, JPG, JFIF, PDF, jusqu'à 50 Mo
                   </p>
                   
                   {selectedFile ? (

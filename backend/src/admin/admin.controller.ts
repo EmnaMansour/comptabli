@@ -114,6 +114,7 @@ export class AdminController {
       email?: string;
       phone?: string;
       companyName?: string;
+      accountantId?: string;
     },
   ) {
     return this.adminService.updateUser(this.actor(req), id, body);

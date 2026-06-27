@@ -18,7 +18,7 @@ test.describe('Test Métier Complet (Full-Stack)', () => {
     
     // Remplissage du formulaire d'inscription (les placeholders sont basés sur Signup.tsx)
     await page.getByPlaceholder('ex john@domain.com').first().fill('nouveau.client@comptabli.com');
-    await page.getByPlaceholder('Entrer votre numéro de téléphone').fill('20123456');
+    await page.getByPlaceholder('Entrer votre numéro').fill('20123456');
     await page.getByPlaceholder('Entrer votre mot de passe').first().fill('password123');
     
     // Cocher les cases de conditions et reCAPTCHA (utilisation générique par texte ou rôle pour ne pas fail)
@@ -51,8 +51,8 @@ test.describe('Test Métier Complet (Full-Stack)', () => {
     test('Parcours Gestion des Tâches', async ({ page }) => {
       await page.goto('/tasks');
       await expect(page).toHaveURL(/.*\/tasks/);
-      // Vérifier que le tableau Kanban ou la liste des tâches s'affiche
-      await expect(page.locator('text=Tâches').first()).toBeVisible({ timeout: 10000 });
+      // Vérifier que le titre Tâches s'affiche
+      await expect(page.getByRole('heading', { name: /tâches/i })).toBeVisible({ timeout: 10000 });
       console.log('Task module loaded.');
     });
 
@@ -60,8 +60,8 @@ test.describe('Test Métier Complet (Full-Stack)', () => {
     test('Parcours Gestion Documentaire', async ({ page }) => {
       await page.goto('/documents');
       await expect(page).toHaveURL(/.*\/documents/);
-      // Vérifier la présence de la zone de dépôt ou de la liste des documents
-      await expect(page.locator('text=Documents').first()).toBeVisible({ timeout: 10000 });
+      // Vérifier la présence du titre Documents
+      await expect(page.getByRole('heading', { name: /documents/i })).toBeVisible({ timeout: 10000 });
       console.log('Documents module loaded.');
     });
 
@@ -69,8 +69,8 @@ test.describe('Test Métier Complet (Full-Stack)', () => {
     test('Parcours Planification Rendez-vous', async ({ page }) => {
       await page.goto('/meetings');
       await expect(page).toHaveURL(/.*\/meetings/);
-      // Vérifier que le calendrier ou l'interface de rendez-vous s'affiche
-      await expect(page.locator('text=Rendez-vous').first()).toBeVisible({ timeout: 10000 });
+      // Vérifier que le titre Rendez-vous s'affiche
+      await expect(page.getByRole('heading', { name: /rendez-vous/i })).toBeVisible({ timeout: 10000 });
       console.log('Meetings module loaded.');
     });
 
@@ -78,8 +78,8 @@ test.describe('Test Métier Complet (Full-Stack)', () => {
     test('Parcours Messagerie', async ({ page }) => {
       await page.goto('/messaging');
       await expect(page).toHaveURL(/.*\/messaging/);
-      // Vérifier que l'interface de chat est présente
-      await expect(page.locator('text=Messagerie').first()).toBeVisible({ timeout: 10000 });
+      // Vérifier que l'interface de chat a un titre
+      await expect(page.getByRole('heading', { name: /messagerie/i })).toBeVisible({ timeout: 10000 });
       console.log('Messaging module loaded.');
     });
 
@@ -87,8 +87,8 @@ test.describe('Test Métier Complet (Full-Stack)', () => {
     test('Parcours Traitement des Demandes', async ({ page }) => {
       await page.goto('/demandes');
       await expect(page).toHaveURL(/.*\/demandes/);
-      // Vérifier l'affichage de la liste des demandes
-      await expect(page.locator('text=Demandes').first()).toBeVisible({ timeout: 10000 });
+      // Vérifier l'affichage du titre Demandes
+      await expect(page.getByRole('heading', { name: /demandes/i })).toBeVisible({ timeout: 10000 });
       console.log('Demandes module loaded.');
     });
 

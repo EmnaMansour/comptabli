@@ -14,7 +14,27 @@ export default defineConfig({
       acc[path] = {
         target: 'http://127.0.0.1:3000',
         changeOrigin: true,
-        ws: true,
+        ws: path === '/socket.io',
+        configure: (proxy: any) => {
+          // Vite attaches its built-in error listener AFTER calling the configure hook.
+          // By deferring to the end of the event loop, we can properly remove them.
+          setTimeout(() => {
+            proxy.removeAllListeners('error');
+            proxy.removeAllListeners('proxyReqWs');
+
+            proxy.on('error', (err: any) => {
+              if (err.code === 'ECONNABORTED') return;
+              console.error(`[vite proxy error] ${err.message}`);
+            });
+
+            proxy.on('proxyReqWs', (_proxyReq: any, _req: any, socket: any) => {
+              socket.on('error', (err: any) => {
+                if (err.code === 'ECONNABORTED') return;
+                console.error(`[vite proxy socket error] ${err.message}`);
+              });
+            });
+          }, 0);
+        },
         bypass: (req: any) => {
           if (req.url.startsWith('/uploads') || req.url.includes('/api/')) return null;
           if (req.headers.accept && req.headers.accept.indexOf('text/html') !== -1) {

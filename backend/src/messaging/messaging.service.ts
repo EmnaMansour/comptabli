@@ -125,9 +125,10 @@ export class MessagingService {
     });
 
     const senderName =
-      msg.sender.firstName && msg.sender.lastName
+      msg.sender.companyName?.trim() ||
+      (msg.sender.firstName && msg.sender.lastName
         ? `${msg.sender.firstName} ${msg.sender.lastName}`
-        : msg.sender.companyName || 'Un utilisateur';
+        : 'Un utilisateur');
 
     for (const p of participants) {
       await this.notifications.createForUser(p.userId, {

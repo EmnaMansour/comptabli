@@ -143,7 +143,7 @@ export class NotificationsService {
     if (clientId) {
       const client = await this.prisma.user.findUnique({ where: { id: clientId } });
       if (client) {
-        contactName = `${client.firstName} ${client.lastName}`;
+        contactName = client.companyName?.trim() || `${client.firstName} ${client.lastName}`.trim();
       }
     }
 

@@ -17,7 +17,7 @@ const mockPrisma = {
   accountantClient: { findMany: jest.fn(), findFirst: jest.fn() },
   accountantCollaborator: { findMany: jest.fn(), findFirst: jest.fn() },
   user: { findUnique: jest.fn() },
-  task: { findFirst: jest.fn(), create: jest.fn(), update: jest.fn() },
+  task: { findFirst: jest.fn(), create: jest.fn(), update: jest.fn(), deleteMany: jest.fn() },
   organization: { findFirst: jest.fn() },
   requestAttachment: { findFirst: jest.fn(), create: jest.fn(), delete: jest.fn() },
   requestComment: { create: jest.fn() },

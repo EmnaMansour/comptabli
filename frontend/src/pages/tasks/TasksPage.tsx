@@ -215,9 +215,21 @@ export default function TasksPage({ hideHeader, filterByAssigneeId }: TasksPageP
     }
   };
 
+  const ALLOWED_EXTENSIONS = ['pdf', 'png', 'jpg', 'jpeg', 'jfif'];
+  const [fileTypeError, setFileTypeError] = useState<string | null>(null);
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!selectedTask || !e.target.files?.length) return;
     const file = e.target.files[0];
+    e.target.value = ''; // reset input
+
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+    if (!ALLOWED_EXTENSIONS.includes(ext)) {
+      setFileTypeError(`Type de fichier non autorisé (.${ext}). Formats acceptés : PDF, PNG, JPG, JPEG, JFIF.`);
+      return;
+    }
+    setFileTypeError(null);
+
     const res = await addTaskAttachment(selectedTask.id, file);
     if (res.ok && res.data) {
        setLocalAttachments(prev => [...prev, res.data!]);
@@ -483,13 +495,19 @@ export default function TasksPage({ hideHeader, filterByAssigneeId }: TasksPageP
 
                 {/* Dropzone */}
                 <div style={{ position: 'relative', border: '2px dashed #cbd5e1', borderRadius: 16, padding: '40px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', cursor: 'pointer' }}>
-                   <input type="file" onChange={handleFileUpload} style={{ position: 'absolute', opacity: 0, top: 0, left: 0, width: '100%', height: '100%', cursor: 'pointer' }} />
+                   <input type="file" accept=".pdf,.png,.jpg,.jpeg,.jfif" onChange={handleFileUpload} style={{ position: 'absolute', opacity: 0, top: 0, left: 0, width: '100%', height: '100%', cursor: 'pointer' }} />
                    <div style={{ width: 48, height: 48, background: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', marginBottom: 16, pointerEvents: 'none' }}>
                      <UploadCloud size={24} color="#64748b" />
                    </div>
                    <p style={{ fontWeight: 800, color: '#0f172a', margin: '0 0 4px', pointerEvents: 'none' }}>Glissez-déposez vos documents</p>
-                   <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: '0 0 24px', pointerEvents: 'none' }}>JPEG, PNG, PDF et MP4, jusqu'à 50 Mo</p>
+                   <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: '0 0 24px', pointerEvents: 'none' }}>JPEG, PNG, JPG, JFIF, PDF, jusqu'à 50 Mo</p>
                    <button className="ws-btn-secondary" style={{ background: '#fff', padding: '8px 24px', pointerEvents: 'none' }}>Sélectionner un fichier</button>
+                   {fileTypeError && (
+                     <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8, background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 10, padding: '10px 14px', color: '#dc2626', fontSize: '0.85rem', fontWeight: 600, width: '100%', boxSizing: 'border-box' }}>
+                       <X size={14} style={{ flexShrink: 0 }} />
+                       {fileTypeError}
+                     </div>
+                   )}
                 </div>
               </div>
             )}
@@ -610,7 +628,7 @@ export default function TasksPage({ hideHeader, filterByAssigneeId }: TasksPageP
                 </button>
                 <button 
                   className="ws-btn-primary" 
-                  style={{ background: confirmModal.confirmColor, color: '#fff', border: 'none', borderRadius: 14, padding: '12px', fontWeight: 700, boxShadow: `0 4px 14px ${confirmModal.confirmColor}30` }}
+                  style={{ background: confirmModal.confirmColor, color: '#fff', border: 'none', borderRadius: 14, padding: '12px', fontWeight: 700, boxShadow: `0 4px 14px ${confirmModal.confirmColor}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}
                   onClick={() => {
                     confirmModal.action();
                     setConfirmModal({ ...confirmModal, show: false });
@@ -1008,6 +1026,12 @@ export default function TasksPage({ hideHeader, filterByAssigneeId }: TasksPageP
                     <label className="ws-input-label">Date d'échéance client</label>
                     <input className="ws-input w-full" type="date" value={ticketForm.clientDeadline} onChange={e => setTicketForm({...ticketForm, clientDeadline: e.target.value})} />
                  </div>
+                 {fileTypeError && (
+                   <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 8, background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 10, padding: '10px 14px', color: '#dc2626', fontSize: '0.85rem', fontWeight: 600 }}>
+                     <X size={16} style={{ flexShrink: 0 }} />
+                     {fileTypeError}
+                   </div>
+                 )}
               </div>
 
               <div>

@@ -52,11 +52,7 @@ test.describe('Authentication Flow', () => {
     await expect(page).toHaveURL(/.*\/dashboard/);
 
     // Verify that the Dashboard rendered by checking for a known dashboard element
-    // Assuming the dashboard has a header or title
-    await expect(page.getByRole('heading', { name: 'Vue Globale' })).toBeVisible({ timeout: 10000 }).catch(() => {
-        // Fallback: Just verify URL changed if we don't know the exact text on the dashboard
-        return true; 
-    });
+    await expect(page.getByRole('heading', { name: /Tableau de bord/i })).toBeVisible({ timeout: 10000 });
   });
 
   test('Login error handling (invalid credentials)', async ({ page }) => {

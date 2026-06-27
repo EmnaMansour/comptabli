@@ -67,6 +67,13 @@ export default function DocumentsPage() {
   const handleUpload = async (file: File) => {
     if (!file) return;
     
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+    if (!['pdf', 'png', 'jpg', 'jpeg', 'jfif'].includes(ext)) {
+      alert(`Le format .${ext} n'est pas autorisé. Seuls PDF et images sont acceptés.`);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+    
     const clientId = user?.role === 'CLIENT' ? user?.id : selectedClientId;
     if (!clientId) {
       alert('Veuillez sélectionner un client pour cet upload.');
@@ -150,6 +157,7 @@ export default function DocumentsPage() {
         <input 
           type="file" 
           ref={fileInputRef} 
+          accept=".pdf,.png,.jpg,.jpeg,.jfif"
           style={{ display: 'none' }} 
           onChange={(e) => { if (e.target.files?.[0]) handleUpload(e.target.files[0]); }} 
         />
@@ -163,7 +171,7 @@ export default function DocumentsPage() {
            <Upload size={48} color="var(--primary-400)" style={{ marginBottom: '1rem' }} />
         )}
         <h3 style={{ marginBottom: '0.5rem', color: 'var(--text-primary)' }}>Glissez vos fichiers ici</h3>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>ou cliquez pour parcourir • PDF, XLSX, DOC, images</p>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>ou cliquez pour parcourir • PDF, Images (JPEG, PNG...)</p>
       </div>
 
       <div className="dashboard-card">

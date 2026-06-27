@@ -218,6 +218,13 @@ export default function MessagingPage() {
     const file = e.target.files?.[0];
     if (!file || !activeId || !token || token === 'demo-token' || !activeDetail) return;
     
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+    if (!['pdf', 'png', 'jpg', 'jpeg', 'jfif'].includes(ext)) {
+      alert(`Le format .${ext} n'est pas autorisé. Seuls PDF et images sont acceptés.`);
+      e.target.value = '';
+      return;
+    }
+    
     // Find client in conversation
     const targetClient = activeDetail.participants.find(p => p.user.role === 'CLIENT')?.userId;
     const actualClientId = role === 'CLIENT' ? user?.id : targetClient;
@@ -590,7 +597,7 @@ export default function MessagingPage() {
                         </button>
                         <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', fontSize: '0.88rem' }}>
                           <Paperclip size={16} /> {isUploading ? 'Chargement...' : 'Joindre un fichier'}
-                          <input type="file" style={{ display: 'none' }} onChange={onFileUpload} disabled={isUploading} />
+                          <input type="file" style={{ display: 'none' }} accept=".pdf,.png,.jpg,.jpeg,.jfif" onChange={onFileUpload} disabled={isUploading} />
                         </label>
                       </div>
                     )}

@@ -14,5 +14,8 @@
     "test": "npm run test --workspaces",
     "test:e2e": "npm run test:e2e --workspace=backend",
     "lint": "npm run lint --workspaces"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1"
   }
 }

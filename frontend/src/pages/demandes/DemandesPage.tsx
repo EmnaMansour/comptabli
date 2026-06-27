@@ -693,8 +693,28 @@ export default function DemandesPage({ forceSection }: { forceSection?: 'my' | '
                   <div className="dem-attach-drop">
                     <span className="dem-attach-label">Nouveau document</span>
                     <label className="ws-btn-outline dem-attach-file-btn">
-                      Parcourir…
-                      <input type="file" multiple style={{ display: 'none' }} onChange={(e) => { const list = e.target.files ? Array.from(e.target.files) : []; if (list.length) setCreateFiles((prev) => [...prev, ...list]); e.target.value = ''; }} />
+                      <input 
+                        type="file" 
+                        multiple 
+                        accept=".pdf,.png,.jpg,.jpeg,.jfif"
+                        style={{ display: 'none' }} 
+                        onChange={(e) => { 
+                          const list = e.target.files ? Array.from(e.target.files) : []; 
+                          if (list.length) {
+                            const validFiles: File[] = [];
+                            for (const f of list) {
+                              const ext = f.name.split('.').pop()?.toLowerCase() ?? '';
+                              if (['pdf', 'png', 'jpg', 'jpeg', 'jfif'].includes(ext)) {
+                                validFiles.push(f);
+                              } else {
+                                showToast('err', `Le type de fichier .${ext} n'est pas autorisé. Seuls PDF et images sont acceptés.`);
+                              }
+                            }
+                            if (validFiles.length) setCreateFiles((prev) => [...prev, ...validFiles]); 
+                          }
+                          e.target.value = ''; 
+                        }} 
+                      />
                     </label>
                   </div>
                   <button type="button" className="ws-btn-primary dem-space-btn" onClick={() => { if (token && token !== 'demo-token') void fetchDocuments().then(setLibraryDocs); setSpacePickerOpen(true); }}>
@@ -849,7 +869,23 @@ export default function DemandesPage({ forceSection }: { forceSection?: 'my' | '
                     {isAccountant && (
                       <label className="ws-btn-outline" style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                         <Paperclip size={16} /> Ajouter un fichier
-                        <input type="file" style={{ display: 'none' }} onChange={(e) => void onAttachDetail(e)} />
+                        <input 
+                          type="file" 
+                          accept=".pdf,.png,.jpg,.jpeg,.jfif"
+                          style={{ display: 'none' }} 
+                          onChange={(e) => {
+                             const f = e.target.files?.[0];
+                             if (f) {
+                               const ext = f.name.split('.').pop()?.toLowerCase() ?? '';
+                               if (!['pdf', 'png', 'jpg', 'jpeg', 'jfif'].includes(ext)) {
+                                 showToast('err', `Le type de fichier .${ext} n'est pas autorisé. Seuls PDF et images sont acceptés.`);
+                                 e.target.value = '';
+                                 return;
+                               }
+                             }
+                             void onAttachDetail(e);
+                          }} 
+                        />
                       </label>
                     )}
 
@@ -945,7 +981,24 @@ export default function DemandesPage({ forceSection }: { forceSection?: 'my' | '
                   <AttachmentCard key={a.id} a={a} canDelete onDelete={() => void removeAttach(a.id)} />
                 ))}
                 <label className="ws-btn-outline" style={{ marginTop: 8, display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                  <Paperclip size={16} /> Ajouter<input type="file" style={{ display: 'none' }} onChange={(e) => void onAttachEdit(e)} />
+                  <Paperclip size={16} /> Ajouter
+                  <input 
+                    type="file" 
+                    accept=".pdf,.png,.jpg,.jpeg,.jfif"
+                    style={{ display: 'none' }} 
+                    onChange={(e) => {
+                       const f = e.target.files?.[0];
+                       if (f) {
+                         const ext = f.name.split('.').pop()?.toLowerCase() ?? '';
+                         if (!['pdf', 'png', 'jpg', 'jpeg', 'jfif'].includes(ext)) {
+                           showToast('err', `Le type de fichier .${ext} n'est pas autorisé. Seuls PDF et images sont acceptés.`);
+                           e.target.value = '';
+                           return;
+                         }
+                       }
+                       void onAttachEdit(e);
+                    }} 
+                  />
                 </label>
               </div>
               <div className="ws-modal-footer">

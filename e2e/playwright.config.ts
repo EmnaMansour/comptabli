@@ -5,7 +5,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1, // Enforce 1 worker to prevent Out-Of-Memory crashes
   reporter: 'html',
   use: {
     baseURL: 'http://localhost:5173',
@@ -17,7 +17,7 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  webServer: [
+  /* webServer: [
     {
       command: 'npm run start:dev',
       cwd: '../backend',
@@ -32,5 +32,5 @@ export default defineConfig({
       reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000,
     }
-  ],
+  ], */
 });

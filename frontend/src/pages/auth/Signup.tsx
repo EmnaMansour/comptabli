@@ -514,7 +514,18 @@ const Signup: React.FC = () => {
         accept=".jpg,.jpeg,.png,.pdf"
         aria-label={label}
         style={{ display: 'none' }}
-        onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); }}
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) {
+            const ext = f.name.split('.').pop()?.toLowerCase() ?? '';
+            if (!['pdf', 'png', 'jpg', 'jpeg', 'jfif'].includes(ext)) {
+              alert(`Le format .${ext} n'est pas autorisé pour ce document. Seuls PDF et images sont acceptés.`);
+              e.target.value = '';
+              return;
+            }
+            onFile(f);
+          }
+        }}
       />
     </div>
   );
