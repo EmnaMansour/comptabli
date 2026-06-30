@@ -7,6 +7,28 @@ import { UsersService } from '../users/users.service';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Role, Status } from '@prisma/client';
 
+// const mockPrisma = {
+//   user: {
+//     findMany: jest.fn(),
+//     findFirst: jest.fn(),
+//     findUnique: jest.fn(),
+//     count: jest.fn(),
+//     groupBy: jest.fn(),
+//     update: jest.fn(),
+//     delete: jest.fn(),
+//   },
+//   organization: {
+//     aggregate: jest.fn(),
+//     findMany: jest.fn(),
+//     update: jest.fn(),
+//     findUnique: jest.fn(),
+//   },
+//   review: { count: jest.fn(), findMany: jest.fn(), update: jest.fn(), findUnique: jest.fn(), delete: jest.fn() },
+//   request: { count: jest.fn() },
+//   auditLog: { findMany: jest.fn() },
+//   refreshToken: { deleteMany: jest.fn() },
+// };
+
 const mockPrisma = {
   user: {
     findMany: jest.fn(),
@@ -25,10 +47,22 @@ const mockPrisma = {
   },
   review: { count: jest.fn(), findMany: jest.fn(), update: jest.fn(), findUnique: jest.fn(), delete: jest.fn() },
   request: { count: jest.fn() },
-  auditLog: { findMany: jest.fn() },
+  document: { count: jest.fn() },
+  task: { count: jest.fn() },
+  message: { count: jest.fn() },
+  meeting: { count: jest.fn() },
+  notification: { deleteMany: jest.fn() },
+  meetingAvailability: { deleteMany: jest.fn() },
+  organizationMember: { deleteMany: jest.fn() },
+  folder: { deleteMany: jest.fn() },
+  accountantClient: { deleteMany: jest.fn() },
+  accountantCollaborator: { deleteMany: jest.fn() },
+  accountantProfile: { deleteMany: jest.fn() },
+  accountantContact: { deleteMany: jest.fn() },
+  auditLog: { findMany: jest.fn(), updateMany: jest.fn() },
   refreshToken: { deleteMany: jest.fn() },
+  $transaction: jest.fn(),
 };
-
 const mockAuditLog = { create: jest.fn(), findAll: jest.fn() };
 const mockMail = { sendActivationEmail: jest.fn() };
 const mockUsers = { create: jest.fn() };
@@ -99,13 +133,28 @@ describe('AdminService', () => {
       await expect(service.deleteUser(actor, 'admin-1')).rejects.toThrow(BadRequestException);
     });
 
-    it('deletes user and logs action', async () => {
-      mockPrisma.user.findUnique.mockResolvedValue({ id: 'user-1', role: Role.CLIENT });
-      mockPrisma.user.delete.mockResolvedValue({ id: 'user-1' });
-      const result = await service.deleteUser(actor, 'user-1');
-      expect(result.success).toBe(true);
-      expect(mockAuditLog.create).toHaveBeenCalledWith(expect.objectContaining({ action: 'ADMIN_USER_DELETE' }));
-    });
+    // it('deletes user and logs action', async () => {
+    //   mockPrisma.user.findUnique.mockResolvedValue({ id: 'user-1', role: Role.CLIENT });
+    //   mockPrisma.user.delete.mockResolvedValue({ id: 'user-1' });
+    //   const result = await service.deleteUser(actor, 'user-1');
+    //   expect(result.success).toBe(true);
+    //   expect(mockAuditLog.create).toHaveBeenCalledWith(expect.objectContaining({ action: 'ADMIN_USER_DELETE' }));
+    // });
+  it('deletes user and logs action', async () => {
+  mockPrisma.user.findUnique.mockResolvedValue({ id: 'user-1', role: Role.CLIENT });
+  mockPrisma.document.count.mockResolvedValue(0);
+  mockPrisma.request.count.mockResolvedValue(0);
+  mockPrisma.task.count.mockResolvedValue(0);
+  mockPrisma.message.count.mockResolvedValue(0);
+  mockPrisma.meeting.count.mockResolvedValue(0);
+  mockPrisma.$transaction.mockResolvedValue([]);
+  mockPrisma.user.delete.mockResolvedValue({ id: 'user-1' });
+
+  const result = await service.deleteUser(actor, 'user-1');
+  expect(result.success).toBe(true);
+  expect(mockAuditLog.create).toHaveBeenCalledWith(expect.objectContaining({ action: 'ADMIN_USER_DELETE' }));
+});
+  
   });
 
   describe('updateStorageQuota', () => {
