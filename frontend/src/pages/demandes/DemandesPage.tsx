@@ -692,7 +692,8 @@ export default function DemandesPage({ forceSection }: { forceSection?: 'my' | '
                 <div className="dem-attach-zone">
                   <div className="dem-attach-drop">
                     <span className="dem-attach-label">Nouveau document</span>
-                    <label className="ws-btn-outline dem-attach-file-btn">
+                    <label className="ws-btn-outline dem-attach-file-btn" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                      <Paperclip size={16} /> Ajouter un fichier
                       <input 
                         type="file" 
                         multiple 

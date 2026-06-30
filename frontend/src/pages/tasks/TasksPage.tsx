@@ -72,7 +72,7 @@ export default function TasksPage({ hideHeader, filterByAssigneeId }: TasksPageP
   const [ticketForm, setTicketForm] = useState({
     title: '', description: '', priority: 'MEDIUM', status: 'PENDING',
     clientId: '', folderId: '', requestId: '', collabDeadline: '', clientDeadline: '',
-    assignedTo: [] as string[],
+    assignedTo: filterByAssigneeId ? [filterByAssigneeId] : ([] as string[]),
   });
 
   // Metadata Lists
@@ -189,7 +189,7 @@ export default function TasksPage({ hideHeader, filterByAssigneeId }: TasksPageP
       setTicketForm({ 
         title: '', description: '', priority: 'MEDIUM', status: 'PENDING', 
         clientId: '', folderId: '', requestId: '', collabDeadline: '', 
-        clientDeadline: '', assignedTo: [] 
+        clientDeadline: '', assignedTo: filterByAssigneeId ? [filterByAssigneeId] : [] 
       });
       setCurrentPage(1);
       await loadTasks(1);
@@ -661,7 +661,10 @@ export default function TasksPage({ hideHeader, filterByAssigneeId }: TasksPageP
                 <Calendar size={15} /> Aujourd'hui
               </button>
               {isAccountant && (
-                <button className="ws-btn-primary" onClick={() => setTicketModal(true)} style={{ whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 16px', fontSize: '0.85rem', borderRadius: 10 }}>
+                <button className="ws-btn-primary" onClick={() => {
+                  setTicketForm(prev => ({ ...prev, assignedTo: filterByAssigneeId ? [filterByAssigneeId] : [] }));
+                  setTicketModal(true);
+                }} style={{ whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 16px', fontSize: '0.85rem', borderRadius: 10 }}>
                   <Plus size={16} /> Nouvelle tâche
                 </button>
               )}
@@ -801,7 +804,10 @@ export default function TasksPage({ hideHeader, filterByAssigneeId }: TasksPageP
 
       {hideHeader && isAccountant && (
         <button
-          onClick={() => setTicketModal(true)}
+          onClick={() => {
+            setTicketForm(prev => ({ ...prev, assignedTo: filterByAssigneeId ? [filterByAssigneeId] : [] }));
+            setTicketModal(true);
+          }}
           style={{
             position: 'fixed',
             right: 24,
@@ -991,7 +997,7 @@ export default function TasksPage({ hideHeader, filterByAssigneeId }: TasksPageP
                  <div style={{ gridColumn: 'span 2' }}>
                     <label className="ws-input-label">Assigner à (Collaborateurs)</label>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, padding: 12, border: '1px solid #e2e8f0', borderRadius: 12, background: '#f8fafc' }}>
-                       {collaborators.map(c => (
+                       {(filterByAssigneeId ? collaborators.filter(c => c.id === filterByAssigneeId) : collaborators).map(c => (
                          <label key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 10px', background: ticketForm.assignedTo.includes(c.id) ? '#eff6ff' : '#fff', border: ticketForm.assignedTo.includes(c.id) ? '1px solid #3b82f6' : '1px solid #e2e8f0', borderRadius: 10, cursor: 'pointer', fontSize: '0.85rem', transition: 'all 0.2s' }}>
                            <input 
                               type="radio" 
@@ -1006,7 +1012,7 @@ export default function TasksPage({ hideHeader, filterByAssigneeId }: TasksPageP
                            </span>
                          </label>
                        ))}
-                       {collaborators.length === 0 && <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Aucun collaborateur trouvé</span>}
+                       {(filterByAssigneeId ? collaborators.filter(c => c.id === filterByAssigneeId) : collaborators).length === 0 && <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Aucun collaborateur trouvé</span>}
                     </div>
                  </div>
 
@@ -1024,7 +1030,7 @@ export default function TasksPage({ hideHeader, filterByAssigneeId }: TasksPageP
                  </div>
                  <div>
                     <label className="ws-input-label">Date d'échéance client</label>
-                    <input className="ws-input w-full" type="date" value={ticketForm.clientDeadline} onChange={e => setTicketForm({...ticketForm, clientDeadline: e.target.value})} />
+                    <input className="ws-input w-full" type="date" min={new Date().toISOString().split('T')[0]} value={ticketForm.clientDeadline} onChange={e => setTicketForm({...ticketForm, clientDeadline: e.target.value})} />
                  </div>
                  {fileTypeError && (
                    <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 8, background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 10, padding: '10px 14px', color: '#dc2626', fontSize: '0.85rem', fontWeight: 600 }}>
@@ -1036,7 +1042,7 @@ export default function TasksPage({ hideHeader, filterByAssigneeId }: TasksPageP
 
               <div>
                  <label className="ws-input-label">Date d'échéance collaborateur (Obligatoire)</label>
-                 <input className="ws-input w-full" type="date" value={ticketForm.collabDeadline} onChange={e => setTicketForm({...ticketForm, collabDeadline: e.target.value})} required />
+                 <input className="ws-input w-full" type="date" min={new Date().toISOString().split('T')[0]} value={ticketForm.collabDeadline} onChange={e => setTicketForm({...ticketForm, collabDeadline: e.target.value})} required />
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 8 }}>

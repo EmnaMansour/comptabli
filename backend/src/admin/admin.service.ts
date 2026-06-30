@@ -549,6 +549,52 @@ export class AdminService {
       throw new BadRequestException('Le compte ADMIN unique ne peut pas etre supprime');
     }
 
+    // Block only on real business data (not auto-generated structures like folders)
+    const [docsCount, requestsCount, tasksCount, messagesCount, meetingsCount] = await Promise.all([
+      this.prisma.document.count({
+        where: { OR: [{ clientId: id }, { accountantId: id }] }
+      }),
+      this.prisma.request.count({
+        where: { OR: [{ clientId: id }, { accountantId: id }, { creatorId: id }] }
+      }),
+      this.prisma.task.count({
+        where: { OR: [{ clientId: id }, { createdBy: id }, { assignees: { some: { id } } }] }
+      }),
+      this.prisma.message.count({
+        where: { senderId: id }
+      }),
+      this.prisma.meeting.count({
+        where: { OR: [{ clientId: id }, { accountantId: id }] }
+      }),
+    ]);
+
+    if (docsCount > 0 || requestsCount > 0 || tasksCount > 0 || messagesCount > 0 || meetingsCount > 0) {
+      throw new BadRequestException(
+        'Impossible de supprimer cet utilisateur car des données importantes y sont liées (documents, tâches, demandes, messages, rendez-vous...). Veuillez le désactiver plutôt.',
+      );
+    }
+
+    // Clean up auto-generated / relational data before physical delete
+    // NOTE: AuditLog and MeetingAvailability have no CASCADE, must be deleted manually
+    await this.prisma.auditLog.updateMany({ where: { userId: id }, data: { userId: null } });
+    await this.prisma.$transaction([
+      this.prisma.refreshToken.deleteMany({ where: { userId: id } }),
+      this.prisma.notification.deleteMany({ where: { userId: id } }),
+      this.prisma.meetingAvailability.deleteMany({ where: { userId: id } }),
+      this.prisma.organizationMember.deleteMany({ where: { userId: id } }),
+      this.prisma.folder.deleteMany({ where: { clientId: id } }),
+      this.prisma.accountantClient.deleteMany({
+        where: { OR: [{ clientId: id }, { accountantId: id }] },
+      }),
+      this.prisma.accountantCollaborator.deleteMany({
+        where: { OR: [{ collaboratorId: id }, { accountantId: id }] },
+      }),
+      this.prisma.accountantProfile.deleteMany({ where: { accountantId: id } }),
+      this.prisma.accountantContact.deleteMany({
+        where: { OR: [{ accountantId: id }, { clientId: id }] },
+      }),
+    ]);
+
     await this.prisma.user.delete({ where: { id } });
     await this.logAction(actor, 'ADMIN_USER_DELETE', 'user', id, user);
     return { success: true };
@@ -563,6 +609,45 @@ export class AdminService {
     if (!accountant) {
       throw new NotFoundException('Comptable introuvable');
     }
+
+    // Block only on real business data
+    const [docsCount, requestsCount, tasksCount, messagesCount, meetingsCount] = await Promise.all([
+      this.prisma.document.count({
+        where: { OR: [{ clientId: id }, { accountantId: id }] }
+      }),
+      this.prisma.request.count({
+        where: { OR: [{ clientId: id }, { accountantId: id }, { creatorId: id }] }
+      }),
+      this.prisma.task.count({
+        where: { OR: [{ clientId: id }, { createdBy: id }, { assignees: { some: { id } } }] }
+      }),
+      this.prisma.message.count({
+        where: { senderId: id }
+      }),
+      this.prisma.meeting.count({
+        where: { OR: [{ clientId: id }, { accountantId: id }] }
+      }),
+    ]);
+
+    if (docsCount > 0 || requestsCount > 0 || tasksCount > 0 || messagesCount > 0 || meetingsCount > 0) {
+      throw new BadRequestException(
+        'Impossible de supprimer ce comptable car des données importantes y sont liées (documents, tâches, demandes, messages, rendez-vous...). Veuillez le désactiver plutôt.',
+      );
+    }
+
+    // Clean up relational data before physical delete
+    // NOTE: AuditLog and MeetingAvailability have no CASCADE, must be handled manually
+    await this.prisma.auditLog.updateMany({ where: { userId: id }, data: { userId: null } });
+    await this.prisma.$transaction([
+      this.prisma.refreshToken.deleteMany({ where: { userId: id } }),
+      this.prisma.notification.deleteMany({ where: { userId: id } }),
+      this.prisma.meetingAvailability.deleteMany({ where: { userId: id } }),
+      this.prisma.organizationMember.deleteMany({ where: { userId: id } }),
+      this.prisma.accountantClient.deleteMany({ where: { accountantId: id } }),
+      this.prisma.accountantCollaborator.deleteMany({ where: { accountantId: id } }),
+      this.prisma.accountantProfile.deleteMany({ where: { accountantId: id } }),
+      this.prisma.accountantContact.deleteMany({ where: { accountantId: id } }),
+    ]);
 
     await this.prisma.user.delete({ where: { id } });
 

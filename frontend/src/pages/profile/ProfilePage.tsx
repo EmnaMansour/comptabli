@@ -13,6 +13,7 @@ import {
   UploadCloud,
   Camera,
   Trash2,
+  RefreshCw,
 } from 'lucide-react';
 import {
   changeAdminPassword,
@@ -268,10 +269,11 @@ export default function ProfilePage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <button
                 type="button"
+                title="Remplacer le fichier"
                 onClick={() => field === 'patenteUrl' ? patenteInputRef.current?.click() : rneInputRef.current?.click()}
-                style={{ background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', borderRadius: '6px', padding: '4px 12px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: 600 }}
+                style={{ background: 'transparent', border: 'none', color: '#2563eb', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 4 }}
               >
-                Remplacer
+                <RefreshCw size={18} />
               </button>
               <button type="button" onClick={() => setIdentity({ ...identity, [field]: '' })} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}>
                 <Trash2 size={18} />

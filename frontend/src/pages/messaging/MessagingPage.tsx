@@ -113,13 +113,25 @@ export default function MessagingPage() {
   );
 
   useEffect(() => {
-    if (loading || !token || token === 'demo-token' || activeId || didAutoOpen.current) return;
+    if (loading || !token || token === 'demo-token') return;
 
-    if (linkedId) {
-      didAutoOpen.current = true;
+    if (linkedId && linkedId !== activeId) {
       setActiveId(linkedId);
+      
+      const convo = conversations.find(c => c.id === linkedId);
+      if (convo) {
+         const other = convo.participants.find(p => p.userId !== user?.id)?.user as MessagingUser | undefined;
+         if (other && other.role !== 'CLIENT') {
+            setTab('collabs');
+         } else if (other && other.role === 'CLIENT') {
+            setTab('clients');
+         }
+      }
+      didAutoOpen.current = true;
       return;
     }
+
+    if (activeId || didAutoOpen.current) return;
 
     if (conversations.length > 0) {
       didAutoOpen.current = true;
@@ -131,7 +143,7 @@ export default function MessagingPage() {
       didAutoOpen.current = true;
       void openOrCreateWith(directory.accountants[0]);
     }
-  }, [loading, token, activeId, linkedId, conversations, directory, role, openOrCreateWith]);
+  }, [loading, token, activeId, linkedId, conversations, directory, role, openOrCreateWith, user?.id]);
 
   useEffect(() => {
     if (!activeId || !token || token === 'demo-token') {
@@ -227,12 +239,14 @@ export default function MessagingPage() {
     
     // Find client in conversation
     const targetClient = activeDetail.participants.find(p => p.user.role === 'CLIENT')?.userId;
-    const actualClientId = role === 'CLIENT' ? user?.id : targetClient;
+    let actualClientId = role === 'CLIENT' ? user?.id : targetClient;
 
     if (!actualClientId) {
-      alert("Impossible de partager un fichier dans cette conversation (aucun client associé).");
-      return;
+      // Fallback pour les conversations entre membres de l'équipe (sans client)
+      actualClientId = user?.id;
     }
+    
+    if (!actualClientId) return;
 
     setIsUploading(true);
     try {
