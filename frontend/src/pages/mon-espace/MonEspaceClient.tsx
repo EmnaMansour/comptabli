@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Navigate, useParams } from 'react-router-dom';
+import { Navigate, useParams, useSearchParams } from 'react-router-dom';
 import {
   FolderOpen,
   Search,
@@ -180,6 +180,28 @@ export default function MonEspaceClient() {
   const [detailFull, setDetailFull] = useState<DocumentDetail | null>(null);
   const [drawerTab, setDrawerTab] = useState<'details' | 'echanges' | 'preview'>('preview');
   const [exchangeInput, setExchangeInput] = useState('');
+
+  // --- Deep-link: open a specific doc on a specific tab from URL params ---
+  const [searchParams, setSearchParams] = useSearchParams();
+  useEffect(() => {
+    const docId = searchParams.get('doc');
+    const tab = searchParams.get('tab') as 'details' | 'echanges' | 'preview' | null;
+    if (!docId) return;
+    // Fetch & open the document
+    fetchDocumentById(docId).then((detail) => {
+      if (!detail) return;
+      setDrawerDoc(detail as AppDocument);
+      setDetailFull(detail);
+      if (tab === 'echanges' || tab === 'details' || tab === 'preview') {
+        setDrawerTab(tab);
+      } else {
+        setDrawerTab('echanges');
+      }
+      // Clean params from URL without navigating
+      setSearchParams({}, { replace: true });
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [shareOpen, setShareOpen] = useState(false);
   const [sharePick, setSharePick] = useState<string | null>(null);
@@ -1161,7 +1183,9 @@ export default function MonEspaceClient() {
                           </button>
                         ) : (
                           <div style={{ display: 'flex', gap: 10 }}>
-                             <button type="button" className="ws-btn-outline" onClick={() => openEditDoc(drawerDoc)}>Modifier</button>
+                             {!(drawerDoc.extractedData && drawerDoc.extractedData.includes('"statut":"ERREUR"')) && (
+                               <button type="button" className="ws-btn-outline" onClick={() => openEditDoc(drawerDoc)}>Modifier</button>
+                             )}
                           </div>
                         )}
                       </div>

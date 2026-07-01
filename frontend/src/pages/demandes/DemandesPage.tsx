@@ -146,10 +146,14 @@ export default function DemandesPage({ forceSection }: { forceSection?: 'my' | '
   const [staffSection, setStaffSection] = useState<'my' | 'clients'>(forceSection || 'clients');
   const [searchParams] = useSearchParams();
   const linkedId = searchParams.get('id');
+  const linkedTab = searchParams.get('tab') as 'details' | 'echanges' | null;
 
   useEffect(() => {
-    if (linkedId) setDetailId(linkedId);
-  }, [linkedId]);
+    if (linkedId) {
+      setDetailId(linkedId);
+      if (linkedTab === 'echanges') setDetailTab('echanges');
+    }
+  }, [linkedId, linkedTab]);
 
   // Sync state with prop if it changes
   useEffect(() => {

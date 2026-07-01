@@ -217,7 +217,8 @@ export class TasksService {
   }
 
   async addComment(taskId: string, content: string, authorId: string) {
-    return this.prisma.taskComment.create({
+    // 1. Create the comment
+    const comment = await this.prisma.taskComment.create({
       data: {
         taskId,
         content,
@@ -227,6 +228,39 @@ export class TasksService {
         author: { select: { id: true, firstName: true, lastName: true } },
       },
     });
+
+    // 2. Get task participants (creator + assignees)
+    const task = await this.prisma.task.findUnique({
+      where: { id: taskId },
+      select: {
+        title: true,
+        createdBy: true,
+        assignees: { select: { id: true } },
+      },
+    });
+
+    if (task) {
+      const authorName = `${comment.author.firstName} ${comment.author.lastName}`.trim();
+      const excerpt = content.length > 80 ? content.slice(0, 80) + '…' : content;
+
+      // Collect all participant IDs except the author
+      const participantIds = new Set<string>();
+      participantIds.add(task.createdBy);
+      for (const a of task.assignees) participantIds.add(a.id);
+      participantIds.delete(authorId); // Don't notify the person who wrote it
+
+      for (const recipientId of participantIds) {
+        await this.notificationsService.createForUser(recipientId, {
+          type: 'TASK_COMMENT',
+          title: `Nouveau commentaire sur "${task.title}"`,
+          message: `${authorName} a commenté : "${excerpt}"`,
+          linkedId: taskId,
+          linkedType: 'Task',
+        });
+      }
+    }
+
+    return comment;
   }
 
   async addAttachment(taskId: string, fileData: { name: string, url: string }, uploaderId: string) {

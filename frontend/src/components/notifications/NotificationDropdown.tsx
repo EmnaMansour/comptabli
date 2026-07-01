@@ -63,9 +63,15 @@ export default function NotificationDropdown() {
     }
 
     const linkSuffix = n.linkedId ? `?id=${n.linkedId}` : '';
-    if (n.type.includes('TASK')) navigate(`/tasks${linkSuffix}`);
+    if (n.type === 'DOCUMENT_COMMENT' && n.linkedId) {
+      // Navigate to the document's Échanges tab directly
+      navigate(`/mon-espace?doc=${n.linkedId}&tab=echanges`);
+    } else if (n.type === 'REQUEST_COMMENT' && n.linkedId) {
+      // Navigate to the request's Échanges tab directly
+      navigate(`/demandes?id=${n.linkedId}&tab=echanges`);
+    } else if (n.type.includes('TASK')) navigate(`/tasks${linkSuffix}`);
     else if (n.type.includes('MEETING')) navigate(`/meetings${linkSuffix}`);
-    else if (n.type.includes('DOCUMENT')) navigate(`/documents${linkSuffix}`);
+    else if (n.type.includes('DOCUMENT')) navigate(`/mon-espace`);
     else if (n.type.includes('MESSAGE')) navigate(`/messaging${linkSuffix}`);
     else if (n.type.includes('REQUEST')) navigate(`/demandes${linkSuffix}`);
   };

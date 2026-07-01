@@ -411,10 +411,20 @@ export class RequestsService {
   }
 
   async addComment(id: string, userId: string, role: Role, content: string) {
-    const request = await this.prisma.request.findUnique({ where: { id } });
+    const request = await this.prisma.request.findUnique({
+      where: { id },
+      select: {
+        clientId: true,
+        accountantId: true,
+        subject: true,
+        type: true,
+      },
+    });
     if (!request) throw new NotFoundException('Demande non trouvée');
     await this.assertRequestAccess(request, userId, role);
-    return this.prisma.requestComment.create({
+
+    // 1. Create comment
+    const comment = await this.prisma.requestComment.create({
       data: {
         requestId: id,
         authorId: userId,
@@ -424,6 +434,35 @@ export class RequestsService {
         author: { select: { id: true, firstName: true, lastName: true, companyName: true } },
       },
     });
+
+    // 2. Notify the other party
+    const authorName = (
+      comment.author.companyName ||
+      `${comment.author.firstName} ${comment.author.lastName}`
+    ).trim();
+    const requestTitle = request.subject?.trim() || request.type;
+    const excerpt = content.length > 80 ? content.slice(0, 80) + '…' : content;
+
+    const recipientIds: string[] = [];
+    if (userId === request.clientId) {
+      // Client wrote → notify accountant
+      if (request.accountantId) recipientIds.push(request.accountantId);
+    } else {
+      // Staff wrote → notify client
+      if (request.clientId && request.clientId !== userId) recipientIds.push(request.clientId);
+    }
+
+    for (const recipientId of recipientIds) {
+      await this.notificationsService.createForUser(recipientId, {
+        type: 'REQUEST_COMMENT',
+        title: `Nouvel échange sur "${requestTitle}"`,
+        message: `${authorName} a commenté : "${excerpt}"`,
+        linkedId: id,
+        linkedType: 'Request',
+      });
+    }
+
+    return comment;
   }
 
   async addAttachment(

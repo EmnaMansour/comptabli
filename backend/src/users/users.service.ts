@@ -523,6 +523,8 @@ export class UsersService {
 
     // Check for other relations before physical delete
     await this.checkUserRelations(id);
+    // Delete auto-generated folders (created at account creation, not real business data)
+    await this.prisma.folder.deleteMany({ where: { clientId: id } });
 
     return this.prisma.user.delete({ where: { id } });
   }
@@ -530,6 +532,8 @@ export class UsersService {
   async remove(id: string) {
     // Check for relations before physical delete
     await this.checkUserRelations(id);
+    // Delete auto-generated folders (created at account creation, not real business data)
+    await this.prisma.folder.deleteMany({ where: { clientId: id } });
     return this.prisma.user.delete({ where: { id } });
   }
 
@@ -538,12 +542,13 @@ export class UsersService {
    * Si oui, la suppression est interdite.
    */
   private async checkUserRelations(id: string) {
+    // Note: folders are auto-created for every client, so we exclude them from blocking checks.
+    // They will be deleted in cascade during the actual deletion.
     const [
       clients,
       collaborators,
       docsAsClient,
       docsAsAccountant,
-      folders,
       meetingsAcc,
       meetingsCli,
       requestsAcc,
@@ -557,7 +562,6 @@ export class UsersService {
       this.prisma.accountantCollaborator.count({ where: { accountantId: id } }),
       this.prisma.document.count({ where: { clientId: id } }),
       this.prisma.document.count({ where: { accountantId: id } }),
-      this.prisma.folder.count({ where: { clientId: id } }),
       this.prisma.meeting.count({ where: { accountantId: id } }),
       this.prisma.meeting.count({ where: { clientId: id } }),
       this.prisma.request.count({ where: { accountantId: id } }),
@@ -569,7 +573,7 @@ export class UsersService {
     ]);
 
     const totalRelations = 
-      clients + collaborators + docsAsClient + docsAsAccountant + folders + 
+      clients + collaborators + docsAsClient + docsAsAccountant +
       meetingsAcc + meetingsCli + requestsAcc + requestsCli + requestsCreator + 
       tasksAssigned + tasksCli + tasksCreator;
 

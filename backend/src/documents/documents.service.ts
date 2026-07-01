@@ -349,7 +349,8 @@ export class DocumentsService {
   }
 
   async addComment(documentId: string, authorId: string, content: string) {
-    return this.prisma.documentComment.create({
+    // 1. Create the comment
+    const comment = await this.prisma.documentComment.create({
       data: {
         documentId,
         authorId,
@@ -359,5 +360,47 @@ export class DocumentsService {
         author: { select: { id: true, firstName: true, lastName: true, companyName: true } },
       },
     });
+
+    // 2. Get the document to know client & accountant
+    const doc = await this.prisma.document.findUnique({
+      where: { id: documentId },
+      select: {
+        name: true,
+        clientId: true,
+        accountantId: true,
+      },
+    });
+
+    if (doc) {
+      const authorName = (
+        comment.author.companyName ||
+        `${comment.author.firstName} ${comment.author.lastName}`
+      ).trim();
+
+      // 3. Determine who to notify (the other party)
+      // If author is the client → notify the accountant
+      // If author is accountant/collab → notify the client
+      const recipientIds: string[] = [];
+
+      if (authorId === doc.clientId) {
+        // Author is the client → notify the accountant (if set)
+        if (doc.accountantId) recipientIds.push(doc.accountantId);
+      } else {
+        // Author is accountant or collaborator → notify the client
+        if (doc.clientId && doc.clientId !== authorId) recipientIds.push(doc.clientId);
+      }
+
+      for (const recipientId of recipientIds) {
+        await this.notificationsService.createForUser(recipientId, {
+          type: 'DOCUMENT_COMMENT',
+          title: `Nouvel échange sur "${doc.name}"`,
+          message: `${authorName} a laissé un commentaire : "${content.length > 80 ? content.slice(0, 80) + '…' : content}"`,
+          linkedId: documentId,
+          linkedType: 'Document',
+        });
+      }
+    }
+
+    return comment;
   }
 }

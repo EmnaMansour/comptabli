@@ -33,7 +33,7 @@ const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
 export default function MessagingPage() {
   const { user, token } = useAuthStore();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const linkedId = searchParams.get('id');
   const role = user?.role ?? '';
 
@@ -126,8 +126,12 @@ export default function MessagingPage() {
          } else if (other && other.role === 'CLIENT') {
             setTab('clients');
          }
+      } else {
+         // Conversation not in our local list, fetch it!
+         void loadConvos();
       }
       didAutoOpen.current = true;
+      setSearchParams({}, { replace: true });
       return;
     }
 

@@ -57,6 +57,21 @@ export default function CollaboratorsPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCollab.firstName || !newCollab.email) return;
+    if (newCollab.password.length < 8) { showToast('err', 'Le mot de passe doit contenir au moins 8 caractères.'); return; }
+    if (!/[A-Z]/.test(newCollab.password)) { showToast('err', 'Le mot de passe doit contenir au moins une lettre majuscule.'); return; }
+    if (!/[0-9]/.test(newCollab.password)) { showToast('err', 'Le mot de passe doit contenir au moins un chiffre.'); return; }
+    if (!/[^A-Za-z0-9]/.test(newCollab.password)) { showToast('err', 'Le mot de passe doit contenir au moins un caractère spécial (!@#$...).'); return; }
+
+    // Validation âge minimum 18 ans
+    if (newCollab.birthDate) {
+      const birth = new Date(newCollab.birthDate);
+      const today = new Date();
+      const age = today.getFullYear() - birth.getFullYear() - (today < new Date(today.getFullYear(), birth.getMonth(), birth.getDate()) ? 1 : 0);
+      if (age < 18) {
+        showToast('err', 'Le collaborateur doit avoir au moins 18 ans.');
+        return;
+      }
+    }
     
     // Default pwd matching backend
     const payload = {
@@ -255,10 +270,52 @@ export default function CollaboratorsPage() {
                   <div>
                     <label className="ws-input-label">Mot de passe</label>
                     <input className="ws-input" type="password" placeholder="Saisir le mot de passe" value={newCollab.password} onChange={e => setNewCollab({...newCollab, password: e.target.value})} required />
+                    {newCollab.password.length > 0 && (
+                      <div style={{ marginTop: 8, background: '#f8fafc', borderRadius: 10, padding: '10px 12px', border: '1px solid #e2e8f0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748b' }}>Force</span>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 800, color:
+                            [/[A-Z]/.test(newCollab.password), /[0-9]/.test(newCollab.password), /[^A-Za-z0-9]/.test(newCollab.password), newCollab.password.length >= 8, newCollab.password.length >= 12].filter(Boolean).length <= 1 ? '#ef4444' :
+                            [/[A-Z]/.test(newCollab.password), /[0-9]/.test(newCollab.password), /[^A-Za-z0-9]/.test(newCollab.password), newCollab.password.length >= 8, newCollab.password.length >= 12].filter(Boolean).length === 2 ? '#f97316' :
+                            [/[A-Z]/.test(newCollab.password), /[0-9]/.test(newCollab.password), /[^A-Za-z0-9]/.test(newCollab.password), newCollab.password.length >= 8, newCollab.password.length >= 12].filter(Boolean).length === 3 ? '#eab308' : '#22c55e'
+                          }}>
+                            {(() => { const s = [/[A-Z]/.test(newCollab.password), /[0-9]/.test(newCollab.password), /[^A-Za-z0-9]/.test(newCollab.password), newCollab.password.length >= 8, newCollab.password.length >= 12].filter(Boolean).length; return s <= 1 ? 'Très faible' : s === 2 ? 'Faible' : s === 3 ? 'Moyen' : s === 4 ? 'Fort' : 'Très fort'; })()}
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', gap: 4, marginBottom: 8 }}>
+                          {[1,2,3,4,5].map(i => { const s = [/[A-Z]/.test(newCollab.password), /[0-9]/.test(newCollab.password), /[^A-Za-z0-9]/.test(newCollab.password), newCollab.password.length >= 8, newCollab.password.length >= 12].filter(Boolean).length; const c = s <= 1 ? '#ef4444' : s === 2 ? '#f97316' : s === 3 ? '#eab308' : '#22c55e'; return <div key={i} style={{ flex: 1, height: 4, borderRadius: 4, background: i <= s ? c : '#e2e8f0' }} />; })}
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px 10px' }}>
+                          {[
+                            { label: '8 caractères min.', ok: newCollab.password.length >= 8 },
+                            { label: 'Majuscule (A-Z)', ok: /[A-Z]/.test(newCollab.password) },
+                            { label: 'Chiffre (0-9)', ok: /[0-9]/.test(newCollab.password) },
+                            { label: 'Caract. spécial', ok: /[^A-Za-z0-9]/.test(newCollab.password) },
+                          ].map(c => (
+                            <div key={c.label} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.72rem' }}>
+                              <span style={{ color: c.ok ? '#22c55e' : '#cbd5e1' }}>{c.ok ? '✓' : '○'}</span>
+                              <span style={{ color: c.ok ? '#15803d' : '#94a3b8', fontWeight: c.ok ? 600 : 400 }}>{c.label}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <label className="ws-input-label">Date de naissance</label>
-                    <input className="ws-input" type="date" value={newCollab.birthDate} onChange={e => setNewCollab({...newCollab, birthDate: e.target.value})} />
+                    <input
+                      className="ws-input"
+                      type="date"
+                      max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]}
+                      value={newCollab.birthDate}
+                      onChange={e => {
+                        const birth = new Date(e.target.value);
+                        const today = new Date();
+                        const age = today.getFullYear() - birth.getFullYear() - (today < new Date(today.getFullYear(), birth.getMonth(), birth.getDate()) ? 1 : 0);
+                        if (e.target.value && age < 18) showToast('err', 'Le collaborateur doit avoir au moins 18 ans.');
+                        setNewCollab({...newCollab, birthDate: e.target.value});
+                      }}
+                    />
                   </div>
                   <div>
                     <label className="ws-input-label">Niveau</label>

@@ -153,6 +153,22 @@ export default function AdminUsersPage() {
       showToast('err', 'Les mots de passe ne correspondent pas');
       return;
     }
+    if (form.password.length < 8) {
+      showToast('err', 'Le mot de passe doit contenir au moins 8 caractères.');
+      return;
+    }
+    if (!/[A-Z]/.test(form.password)) {
+      showToast('err', 'Le mot de passe doit contenir au moins une lettre majuscule.');
+      return;
+    }
+    if (!/[0-9]/.test(form.password)) {
+      showToast('err', 'Le mot de passe doit contenir au moins un chiffre.');
+      return;
+    }
+    if (!/[^A-Za-z0-9]/.test(form.password)) {
+      showToast('err', 'Le mot de passe doit contenir au moins un caractère spécial (!@#$...).');
+      return;
+    }
     try {
       const created = await createAdminUser({
         firstName: form.firstName,
@@ -501,6 +517,90 @@ function StatCard({
 //   );
 // }
 
+function getPasswordStrength(pwd: string): { score: number; label: string; color: string } {
+  if (!pwd) return { score: 0, label: '', color: '#e2e8f0' };
+  const checks = [
+    pwd.length >= 8,
+    /[A-Z]/.test(pwd),
+    /[0-9]/.test(pwd),
+    /[^A-Za-z0-9]/.test(pwd),
+    pwd.length >= 12,
+  ];
+  const score = checks.filter(Boolean).length;
+  if (score <= 1) return { score: 1, label: 'Très faible', color: '#ef4444' };
+  if (score === 2) return { score: 2, label: 'Faible', color: '#f97316' };
+  if (score === 3) return { score: 3, label: 'Moyen', color: '#eab308' };
+  if (score === 4) return { score: 4, label: 'Fort', color: '#22c55e' };
+  return { score: 5, label: 'Très fort', color: '#16a34a' };
+}
+
+function PasswordFields({
+  password,
+  confirmPassword,
+  setForm,
+}: {
+  password: string;
+  confirmPassword: string;
+  setForm: React.Dispatch<React.SetStateAction<UserFormState>>;
+}) {
+  const strength = getPasswordStrength(password);
+  const criteria = [
+    { label: '8 caractères minimum', ok: password.length >= 8 },
+    { label: 'Une majuscule (A-Z)', ok: /[A-Z]/.test(password) },
+    { label: 'Un chiffre (0-9)', ok: /[0-9]/.test(password) },
+    { label: 'Caractère spécial (!@#...)', ok: /[^A-Za-z0-9]/.test(password) },
+  ];
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <input
+          className="ws-input"
+          type="password"
+          placeholder="Mot de passe"
+          value={password}
+          onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))}
+          required
+        />
+        <input
+          className="ws-input"
+          type="password"
+          placeholder="Confirmer mot de passe"
+          value={confirmPassword}
+          onChange={(e) => setForm((prev) => ({ ...prev, confirmPassword: e.target.value }))}
+          required
+        />
+      </div>
+      {password.length > 0 && (
+        <div style={{ background: '#f8fafc', borderRadius: 10, padding: '12px 14px', border: '1px solid #e2e8f0' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b' }}>Force du mot de passe</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: strength.color }}>{strength.label}</span>
+          </div>
+          <div style={{ display: 'flex', gap: 4, marginBottom: 10 }}>
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} style={{ flex: 1, height: 5, borderRadius: 4, background: i <= strength.score ? strength.color : '#e2e8f0', transition: 'background 0.3s ease' }} />
+            ))}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 12px' }}>
+            {criteria.map((c) => (
+              <div key={c.label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.75rem' }}>
+                <span style={{ color: c.ok ? '#22c55e' : '#94a3b8' }}>{c.ok ? '✓' : '○'}</span>
+                <span style={{ color: c.ok ? '#166534' : '#94a3b8', fontWeight: c.ok ? 600 : 400 }}>{c.label}</span>
+              </div>
+            ))}
+          </div>
+          {confirmPassword.length > 0 && (
+            <div style={{ marginTop: 8, fontSize: '0.75rem', fontWeight: 600, color: password === confirmPassword ? '#16a34a' : '#ef4444', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span>{password === confirmPassword ? '✓' : '✗'}</span>
+              {password === confirmPassword ? 'Les mots de passe correspondent' : 'Les mots de passe ne correspondent pas'}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function UserModal({
   title,
   subtitle,
@@ -576,10 +676,7 @@ function UserModal({
             ) : null}
 
             {showPassword ? (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <input className="ws-input" type="password" placeholder="Mot de passe" value={form.password} onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))} required />
-                <input className="ws-input" type="password" placeholder="Confirmer mot de passe" value={form.confirmPassword} onChange={(e) => setForm((prev) => ({ ...prev, confirmPassword: e.target.value }))} required />
-              </div>
+              <PasswordFields password={form.password} confirmPassword={form.confirmPassword} setForm={setForm} />
             ) : null}
           </div>
           <div className="ws-modal-footer">

@@ -73,6 +73,36 @@ export default function ClientsPage() {
     if (!sanitizedData.companyName) delete sanitizedData.companyName;
     if (!sanitizedData.password) delete sanitizedData.password;
 
+    // Validation âge minimum 18 ans
+    if (sanitizedData.birthDate) {
+      const birth = new Date(sanitizedData.birthDate);
+      const today = new Date();
+      const age = today.getFullYear() - birth.getFullYear() - (today < new Date(today.getFullYear(), birth.getMonth(), birth.getDate()) ? 1 : 0);
+      if (age < 18) {
+        showToast('err', 'Le client doit avoir au moins 18 ans.');
+        return;
+      }
+    }
+
+    if (!editingClient && sanitizedData.password) {
+      if (sanitizedData.password.length < 8) {
+        showToast('err', 'Le mot de passe doit contenir au moins 8 caractères.');
+        return;
+      }
+      if (!/[A-Z]/.test(sanitizedData.password)) {
+        showToast('err', 'Le mot de passe doit contenir au moins une lettre majuscule.');
+        return;
+      }
+      if (!/[0-9]/.test(sanitizedData.password)) {
+        showToast('err', 'Le mot de passe doit contenir au moins un chiffre.');
+        return;
+      }
+      if (!/[^A-Za-z0-9]/.test(sanitizedData.password)) {
+        showToast('err', 'Le mot de passe doit contenir au moins un caractère spécial (!@#$...).');
+        return;
+      }
+    }
+
     if (editingClient) {
       const res = await updateClient(editingClient.id, sanitizedData);
       if (res.ok) {
@@ -274,11 +304,56 @@ export default function ClientsPage() {
                   </div>
                   <div>
                     <label className="ws-input-label">Date de naissance</label>
-                    <input type="date" className="ws-input" value={formData.birthDate} onChange={e => setFormData({...formData, birthDate: e.target.value})} />
+                    <input
+                      type="date"
+                      className="ws-input"
+                      value={formData.birthDate}
+                      max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]}
+                      onChange={e => {
+                        const birth = new Date(e.target.value);
+                        const today = new Date();
+                        const age = today.getFullYear() - birth.getFullYear() - (today < new Date(today.getFullYear(), birth.getMonth(), birth.getDate()) ? 1 : 0);
+                        if (e.target.value && age < 18) {
+                          showToast('err', 'Le client doit avoir au moins 18 ans.');
+                        }
+                        setFormData({...formData, birthDate: e.target.value});
+                      }}
+                    />
                   </div>
                   <div style={{ gridColumn: 'span 2' }}>
                     <label className="ws-input-label">{editingClient ? 'Nouveau mot de passe (laisser vide pour ne pas changer)' : 'Mot de passe'}</label>
                     <input type="password" title="password" className="ws-input" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} required={!editingClient} />
+                    {!editingClient && formData.password.length > 0 && (
+                      <div style={{ marginTop: 8, background: '#f8fafc', borderRadius: 10, padding: '10px 12px', border: '1px solid #e2e8f0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748b' }}>Force</span>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 800, color:
+                            [/[A-Z]/.test(formData.password), /[0-9]/.test(formData.password), /[^A-Za-z0-9]/.test(formData.password), formData.password.length >= 8, formData.password.length >= 12].filter(Boolean).length <= 1 ? '#ef4444' :
+                            [/[A-Z]/.test(formData.password), /[0-9]/.test(formData.password), /[^A-Za-z0-9]/.test(formData.password), formData.password.length >= 8, formData.password.length >= 12].filter(Boolean).length === 2 ? '#f97316' :
+                            [/[A-Z]/.test(formData.password), /[0-9]/.test(formData.password), /[^A-Za-z0-9]/.test(formData.password), formData.password.length >= 8, formData.password.length >= 12].filter(Boolean).length === 3 ? '#eab308' :
+                            '#22c55e'
+                          }}>
+                            {(() => { const s = [/[A-Z]/.test(formData.password), /[0-9]/.test(formData.password), /[^A-Za-z0-9]/.test(formData.password), formData.password.length >= 8, formData.password.length >= 12].filter(Boolean).length; return s <= 1 ? 'Très faible' : s === 2 ? 'Faible' : s === 3 ? 'Moyen' : s === 4 ? 'Fort' : 'Très fort'; })()}
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', gap: 4, marginBottom: 8 }}>
+                          {[1,2,3,4,5].map(i => { const s = [/[A-Z]/.test(formData.password), /[0-9]/.test(formData.password), /[^A-Za-z0-9]/.test(formData.password), formData.password.length >= 8, formData.password.length >= 12].filter(Boolean).length; const c = s <= 1 ? '#ef4444' : s === 2 ? '#f97316' : s === 3 ? '#eab308' : '#22c55e'; return <div key={i} style={{ flex: 1, height: 4, borderRadius: 4, background: i <= s ? c : '#e2e8f0' }} />; })}
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px 10px' }}>
+                          {[
+                            { label: '8 caractères min.', ok: formData.password.length >= 8 },
+                            { label: 'Majuscule (A-Z)', ok: /[A-Z]/.test(formData.password) },
+                            { label: 'Chiffre (0-9)', ok: /[0-9]/.test(formData.password) },
+                            { label: 'Caract. spécial', ok: /[^A-Za-z0-9]/.test(formData.password) },
+                          ].map(c => (
+                            <div key={c.label} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.72rem' }}>
+                              <span style={{ color: c.ok ? '#22c55e' : '#cbd5e1' }}>{c.ok ? '✓' : '○'}</span>
+                              <span style={{ color: c.ok ? '#15803d' : '#94a3b8', fontWeight: c.ok ? 600 : 400 }}>{c.label}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

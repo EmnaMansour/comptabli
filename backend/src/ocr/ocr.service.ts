@@ -89,6 +89,14 @@ export class OcrService {
       // 5. Appeler le microservice Python
       const resultat = await this.appelerMicroservice(filePath);
 
+      // --- FILTRE ANTI FAUX-POSITIFS (Validation pour la soutenance) ---
+      // On utilise le "quality scoring" pour bloquer les images non pertinentes (ex: photos random, diagrammes UML)
+      const confGlobale = resultat.global_confidence_score ?? 0;
+      if (confGlobale < 0.30 && !resultat.total_ttc && !resultat.numero_facture) {
+         throw new Error("Le document ne semble pas être une facture valide (Score de reconnaissance trop faible).");
+      }
+      // ------------------------------------------------------------------
+
       // 6. Sauvegarder dans Document.extractedData
       const extractedPayload = {
         statut: 'TERMINE',
@@ -104,7 +112,6 @@ export class OcrService {
       // 7. Créer / mettre à jour l'Invoice
       await this.sauvegarderInvoice(documentId, resultat);
 
-      const confGlobale = resultat.global_confidence_score ?? 0;
       this.logger.log(
         `[OCR] ✅ Document ${documentId} extrait — confiance globale ${(confGlobale * 100).toFixed(1)}%`,
       );
